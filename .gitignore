@@ -1,9 +1,8 @@
 # Ignore all
 *
-*.json
-.vscode/*
 
-# Except these
+
+# Except 
 !.gitignore
 !Makefile
 !LICENSE
@@ -11,4 +10,4 @@
 !modules
 !modules/headers/*.h
 !modules/cfiles/*.c
-!*.c
+!ipkcpd.c
