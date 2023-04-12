@@ -1,4 +1,4 @@
-#include "calculator.h"
+#include "../headers/calculator.h"
 
 void calculator()
 {
