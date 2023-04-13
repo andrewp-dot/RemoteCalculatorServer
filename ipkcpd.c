@@ -7,15 +7,20 @@
 /* Custom modules */
 #include "./modules/headers/calculator.h"
 
+#define USAGE "./ipcpd -h <host> -p <port> -m <mode>\n"
+
 /* Exit status */
 #define SUCCESS 0
 #define EXIT_FAILURE 1 
 #define ERROR_EXIT_ARGS 2
-#define PORT_UNDEFINED -1
 
+/* port macros*/
+#define PORT_UNDEFINED -1
+#define MAX_PORT 65535
+
+/* ipv4 macros */
 #define IPV4_LENGTH 16 //255.255.255.255\0
 #define IP_PART_LIMIT 255
-#define MAX_PORT 65535
 
 typedef enum connection_mode{
     tcp,
@@ -29,6 +34,7 @@ connection_mode_t mode = undef;
 /* FUNCTION DECLARTIONS */
 bool verify_ipv4(char * ip);
 bool verify_port(char * port);
+connection_mode_t get_mode(char * mode);
 
 int main(int argc, char ** argv)
 {   
@@ -56,6 +62,7 @@ int main(int argc, char ** argv)
                     port = atoi(argv[arg]);
                     break;
                 case 'm':
+                    mode = get_mode(argv[++arg]);
                     break;
                 default:
                     fprintf(stderr,"Unkown flag: %s\n",argv[arg]);
@@ -64,9 +71,11 @@ int main(int argc, char ** argv)
 
         }
     }
-    if(port == PORT_UNDEFINED || strlen(ip_address) == 0 ) return ERROR_EXIT_ARGS;
-    printf("ip: %s \nport: %d \nmode: Not implemented yet\n",ip_address,port);
-    calculator();
+    if(port == PORT_UNDEFINED || strlen(ip_address) == 0 || mode == undef)
+    {
+        fprintf(stderr, "Undefined required parameters.\n%s",USAGE);
+        return ERROR_EXIT_ARGS;
+    }
     return SUCCESS;
 }
 
@@ -106,4 +115,11 @@ bool verify_port(char * port)
     }
     if(atoi(port) > MAX_PORT || atoi(port) < 0) return false;
     return true;
+}
+
+connection_mode_t get_mode(char * mode)
+{
+    if(!strcmp("tcp",mode)) return tcp;
+    else if(!strcmp("udp",mode)) return udp;
+    else return undef;
 }
