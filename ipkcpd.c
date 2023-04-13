@@ -57,6 +57,23 @@ bool verify_ipv4(char * ip);
 bool verify_port(char * port);
 connection_mode_t get_mode(char * mode);
 
+/* docasne funkce */
+void print_token_type(token_t token)
+{
+    if(token.type == LB) printf("LB: ");
+    else if(token.type == RB) printf("RB: ");
+    else if(token.type == OPERATOR) printf("OPERATOR: ");
+    else if(token.type == OPERAND) printf("OPERAND: ");
+    else if(token.type == SPACE) printf("SPACE: ");
+    else if(token.type == UNKNOWN) 
+    {
+        printf("UNKNOWN: ");
+    }
+    else printf("ERR: ");
+    if(token.type == OPERAND) printf("Value: %f\n",token.value);
+    else printf("c: %c, decimal: %d\n",token.sym,token.sym);
+}
+
 int main(int argc, char ** argv)
 {   
     char ip_address[IPV4_LENGTH] = {0};
@@ -97,6 +114,25 @@ int main(int argc, char ** argv)
         fprintf(stderr, "Undefined required parameters.\n%s",USAGE);
         return ERROR_EXIT_ARGS;
     }
+
+    char c;
+    int idx = 0;
+    char * char_arr = (char *)malloc(100*sizeof(char));
+    char * expr = char_arr;
+    while ((c = getchar()) != EOF)
+    {
+        expr[idx] = c;
+        idx++;
+    }
+    printf("LOADED: %s\n",expr);
+
+    token_t curr_token;
+    while (*expr != '\0')
+    {
+        curr_token = get_token(&expr); 
+        print_token_type(curr_token);
+    }
+    free(char_arr);
     return SUCCESS;
 }
 
