@@ -11,20 +11,30 @@
 #define SUCCESS 0
 #define EXIT_FAILURE 1 
 #define ERROR_EXIT_ARGS 2
+#define PORT_UNDEFINED -1
 
+#define IPV4_LENGTH 16 //255.255.255.255\0
 #define IP_PART_LIMIT 255
 #define MAX_PORT 65535
+
+typedef enum connection_mode{
+    tcp,
+    udp,
+    undef
+}connection_mode_t;
+
+int port = PORT_UNDEFINED;
+connection_mode_t mode = undef;
 
 /* FUNCTION DECLARTIONS */
 bool verify_ipv4(char * ip);
 bool verify_port(char * port);
 
 int main(int argc, char ** argv)
-{
-    printf("[IPK2]: Prepare to die...\n");
-    
+{   
+    char ip_address[IPV4_LENGTH] = {0};
+
     /* load args */
-    
     for(int arg = 1; arg < argc; arg++)
     {
         if(argv[arg][0] == '-')
@@ -39,9 +49,11 @@ int main(int argc, char ** argv)
             {
                 case 'h':
                     if(!verify_ipv4(argv[++arg])) return ERROR_EXIT_ARGS;
+                    strcpy(ip_address,argv[arg]);
                     break;
                 case 'p':
                     if(!verify_port(argv[++arg])) return ERROR_EXIT_ARGS;
+                    port = atoi(argv[arg]);
                     break;
                 case 'm':
                     break;
@@ -52,6 +64,8 @@ int main(int argc, char ** argv)
 
         }
     }
+    if(port == PORT_UNDEFINED || strlen(ip_address) == 0 ) return ERROR_EXIT_ARGS;
+    printf("ip: %s \nport: %d \nmode: Not implemented yet\n",ip_address,port);
     calculator();
     return SUCCESS;
 }
@@ -62,22 +76,22 @@ bool verify_ipv4(char * ip)
     int ip_length = strlen(ip);
     if(ip_length == 0) return false;
     if(!(isdigit(ip[0]) && isdigit(ip[ip_length - 1]))) return false;
-    
+
     int ip_parts_count = 0;
-    while (ip != NULL)
+
+    while (*ip != '\0')
     {
-        
-        char num_part[3];
-        for(int idx = 0; isdigit(*ip); idx++)
+        char ip_part[3] = {0,};
+        for(int idx = 0; *ip != '.' && *ip != '\0'; idx++)
         {
-            if(idx == 3) return false;
-            num_part[idx] = *ip;
+            if(idx >= 3 || !isdigit(*ip)) return false;
+            ip_part[idx] = *ip;
             ip += 1;
         }
-        if(*ip != '.') return false;
+        if(*ip == '\0') break;
         ip += 1;
         ip_parts_count += 1;
-        if(ip_parts_count > 4 || atoi(num_part) > IP_PART_LIMIT || atoi(num_part) < 0) return false;
+        if(ip_parts_count > 4 || atoi(ip_part) > IP_PART_LIMIT || atoi(ip_part) < 0) return false;
     }
     return true;
 }
@@ -85,9 +99,10 @@ bool verify_ipv4(char * ip)
 bool verify_port(char * port)
 {
     if (port == NULL) return false;
-    while (port != NULL)
+    while (*port != '\0')
     {
         if(!isdigit(*port)) return false;
+        port += 1;
     }
     if(atoi(port) > MAX_PORT || atoi(port) < 0) return false;
     return true;

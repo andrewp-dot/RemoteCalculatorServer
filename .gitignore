@@ -1,7 +1,6 @@
 # Ignore all
 *
 
-
 # Except 
 !.gitignore
 !Makefile
