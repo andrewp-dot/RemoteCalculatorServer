@@ -7,6 +7,9 @@
 !LICENSE
 !README.md
 !modules
-!modules/headers/*.h
-!modules/cfiles/*.c
+!modules/*
+!modules/cfiles
+!modules/cfiles/*
+!modules/headers
+!modules/headers/*
 !ipkcpd.c

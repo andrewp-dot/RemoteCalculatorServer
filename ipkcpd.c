@@ -23,7 +23,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <ctype.h>
 
 /* Custom modules */
-#include "./modules/headers/calculator.h"
+#include "./modules/headers/binary_calc.h"
+#include "./modules/headers/textual_calc.h"
+#include "./modules/headers/udp_module.h"
+#include "./modules/headers/tcp_module.h"
+
 
 #define USAGE "./ipcpd -h <host> -p <port> -m <mode>\n"
 
