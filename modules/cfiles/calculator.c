@@ -2,63 +2,32 @@
 #include <string.h>
 #include <ctype.h>
 
+/* temporary functions */
+void print_token_type(token_t token)
+{
+    if(token.type == LB) printf("LB: ");
+    else if(token.type == RB) printf("RB: ");
+    else if(token.type == OPERATOR) printf("OPERATOR: ");
+    else if(token.type == OPERAND) printf("OPERAND: ");
+    else if(token.type == SPACE) printf("SPACE: ");
+    else if(token.type == UNKNOWN) printf("UNKNOWN: ");
+    else if(token.type == NEWLINE) printf("NEWLINE: ");
+    else printf("ERR: ");
+    if(token.type == OPERAND) printf("Value: %d\n",token.value);
+    else printf("c: %c, decimal: %d\n",token.sym,token.sym);
+}
+
 bool is_number(char * num)
 {
     if(num == NULL) return false;
 
-    bool dot_found = false;
-    while (*num != '\0')
+    if(*num == '-') num += 1;
+    while (*num != ' ' && *num != ')')
     {
-        if(dot_found && *num == '.') return false;
-        if(!dot_found) {
-            dot_found = true;
-            continue;
-        }
         if(!isdigit(*num)) return false;
         num += 1;
     }
     return true;
-}
-
-token_t get_token(char ** expr)
-{
-    token_t current_token;
-    if(isdigit(**expr))
-    {
-        char buffer[MAX_FLOAT_LENGTH] = {0};
-        bool dot_found = false;
-        int idx = 0;
-        while (**expr == '.' || isdigit(**expr))
-        {
-            if(dot_found && **expr == '.') 
-            {
-                current_token.type = UNKNOWN;
-                return current_token;
-            }
-            if(**expr == '.') dot_found = true;
-            buffer[idx] = **expr;
-            (*expr)++;
-            idx += 1;
-        }
-        current_token.type = OPERAND;
-        current_token.value = strtof(buffer,NULL);
-        // printf("\t BUFFER: %s \n", buffer,NULL);
-        // printf("\t STRTOF: %f \n", strtof(buffer,NULL));
-        return current_token;
-    }
-    else if(**expr == '(') current_token.type = LB;
-    else if(**expr == ')') current_token.type = RB;
-    else if(is_operation(**expr)) current_token.type = OPERATOR;
-    else if (**expr == ' ') current_token.type = SPACE;
-    else
-    {
-        current_token.type = UNKNOWN;
-        (*expr)++;
-        return current_token;
-    }
-    current_token.sym = **expr;
-    (*expr)++;
-    return current_token;
 }
 
 bool is_operation(char op)
@@ -75,6 +44,78 @@ bool is_operation(char op)
     }
 }
 
+operation_t get_operation(char sym)
+{
+    switch (sym)
+    {
+    case '+':
+        return ADD;
+    case '-':
+        return SUB;
+    case '*':
+        return MUL;
+    case '/':
+        return DIV;
+    default:
+        return NOT_SUPPORTED;
+    }
+}
+
+token_t get_token(char ** expr)
+{
+    token_t current_token;
+    if(isdigit(**expr) || **expr == '-')
+    {
+        char buffer[MAX_FLOAT_LENGTH] = {0};
+        int idx = 0;
+        if(**expr == '-') 
+        {
+            buffer[idx++] = '-';
+            (*expr)++;
+        }
+        while (isdigit(**expr)) 
+        {
+            buffer[idx] = **expr;
+            (*expr)++;
+            idx += 1;
+        }
+        current_token.type = OPERAND;
+        current_token.value = atoi(buffer);
+        return current_token;
+    }
+    else if(**expr == '(') current_token.type = LB;
+    else if(**expr == ')') current_token.type = RB;
+    else if(is_operation(**expr)) current_token.type = OPERATOR;
+    else if (**expr == ' ') current_token.type = SPACE;
+    else if (**expr == '\n') current_token.type = NEWLINE;
+    else
+    {
+        current_token.type = UNKNOWN;
+        (*expr)++;
+        return current_token;
+    }
+    current_token.sym = **expr;
+    (*expr)++;
+    return current_token;
+}
+
+int compute(int op1,int op2,char operator)
+{
+    switch (get_operation(operator))
+    {
+    case ADD:
+        return op1 + op2;
+    case SUB:
+        return op1 - op2;
+    case MUL:
+        return op1 * op2;
+    case DIV:
+        return op1 / op2;
+    default: 
+        return ERR;
+    }
+}
+
 /**
  * @brief Get the result of expresion expr
  * note:    it supports only (op E E), where 
@@ -84,15 +125,78 @@ bool is_operation(char op)
  * @param err_msg_buffer 
  * @return float 
  */
-float get_result(char * expr, char * err_msg_buffer[ERR_MSG_LENGTH])
+// int get_result(char * expr, char * err_msg_buffer[ERR_MSG_LENGTH])
+int get_result(char * expr)
 {
-    *err_msg_buffer[0] = '\0';
-    if(is_number(expr)) return strtof(expr,NULL);
-    token_t current_token;
-
+    printf("%s\n",expr);
+    if(is_number(expr)) return atoi(expr);
+    
+    int operand_num = 0;
+    int operands[2] = {ERR,ERR};
+    char operator = 0;
+    
+    token_t current_token = get_token(&expr);
+    
     while (*expr != '\0')
     {
-        current_token = get_token(&expr); 
+        switch (current_token.type)
+        {
+        case LB:
+            printf("LB\n");
+            current_token = get_token(&expr);
+            if(current_token.type != OPERATOR)  return ERR;
+            // strcpy(*err_msg_buffer,"Unexpected token.\n");
+            break;
+        case OPERATOR:
+            printf("OPERATOR\n");
+            operator = current_token.sym;
+            current_token = get_token(&expr);
+            if(current_token.type != SPACE)  return ERR;
+            // strcpy(*err_msg_buffer,"Unexpected token.\n");
+            break;
+        case SPACE:
+            printf("SPACE\n");
+            current_token = get_token(&expr);
+            if(current_token.type != OPERAND && current_token.type != LB) return ERR;
+            if(current_token.type == LB)
+            {
+                operands[operand_num] = get_result(expr);
+                current_token = get_token(&expr); //tokeny zanechava pôvodne, 
+                //treba aktualizovat pointer, na miesto a pokracovt v tokenizovani
+                operand_num += 1;
+            }
+            break;
+        case OPERAND:
+        case RB:
+            if(current_token.type == OPERAND)
+            {
+                printf("OPERAND\n");
+                if(operand_num >= 2) 
+                {
+                    printf("too many operands\n"); return ERR;
+                }
+                operands[operand_num] = current_token.value;
+                operand_num += 1;
+            }
+            else 
+            {
+                printf("RB\n");
+                printf("_____ END RECURSON ____\n");
+                printf("op0: %d op1: %d operator: %c \n",operands[0],operands[1],operator);
+                return compute(operands[0],operands[1],operator);
+            }
+            current_token = get_token(&expr);
+            // if(current_token.type != SPACE || current_token.type != RB) return ERR;
+            // strcpy(*err_msg_buffer,"Unexpected token.\n");
+            break;
+        // case NEWLINE:
+        //     return compute(operands[0],operands[1],operator);
+        default:
+            // strcpy(*err_msg_buffer,"Unexpected token.\n");
+            return ERR;
+        }
     }
-    return 0;
+    // printf("op0: %d op1: %d operator: %c \n",operands[0],operands[1],operator);
+    printf("_____ END RECURSON ____\n");
+    return compute(operands[0],operands[1],operator);
 }

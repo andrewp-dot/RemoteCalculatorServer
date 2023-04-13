@@ -7,6 +7,8 @@
 
 #define ERR_MSG_LENGTH 128
 #define MAX_FLOAT_LENGTH 100
+
+#define ERR -10
 typedef enum token_type{
     LB,
     RB,
@@ -14,17 +16,28 @@ typedef enum token_type{
     OPERAND,
     SPACE,
     UNKNOWN,
+    NEWLINE
 }token_type_t;
 
 typedef struct token{
     token_type_t type;
-    float value;
+    int value;
     char sym;
 }token_t;
 
-token_t get_token(char ** expr);
+typedef enum operation{
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    NOT_SUPPORTED
+}operation_t;
+
 bool is_number(char * num);
 bool is_operation(char op);
-float get_result(char * expr,char * err_msg_buffer[ERR_MSG_LENGTH]);
-
+operation_t get_operation(char sym);
+token_t get_token(char ** expr);
+int compute(int op1,int op2,char operator);
+// int get_result(char * expr,char * err_msg_buffer[ERR_MSG_LENGTH]);
+int get_result(char * expr);
 #endif
