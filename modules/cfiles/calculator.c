@@ -158,14 +158,14 @@ frac_t get_result(char ** expr)
             break;
         case OPERAND:
             if(operand_num >= 2) 
-                {
-                    printf("too many operands\n"); return ERR_FRAC;
-                }
-                operands[operand_num] = num_to_frac(current_token.value);
-                operand_num += 1;
-                current_token = get_token(expr);
-                if(current_token.type != SPACE && current_token.type != RB ) return ERR_FRAC;
-                break;
+            {
+                printf("Too many operands\n"); return ERR_FRAC;
+            }
+            operands[operand_num] = num_to_frac(current_token.value);
+            operand_num += 1;
+            current_token = get_token(expr);
+            if(current_token.type != SPACE && current_token.type != RB ) return ERR_FRAC;
+            break;
         case RB:
             return compute(operands[0],operands[1],operator);
         default:

@@ -1,6 +1,10 @@
 #ifndef FRAC_H
 #define FRAC_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 typedef struct fraction{
     int numerator;
     int denominator;
@@ -18,7 +22,8 @@ frac_t num_to_frac(int num);
 /* Cosmetic changes */
 void to_basic_shape(frac_t * f);
 frac_t inverted_fraction(frac_t f);
-int convert_to_number(frac_t f);
+void num_to_string(int num,char * str);
+void frac_to_string(frac_t f, char * str);
 
 /* Operations with fractions*/
 frac_t frac_add(frac_t op1,frac_t op2);

@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
  * SOURCES:
  * https://www.programiz.com/c-programming/examples/hcf-gcd
  * https://www.programiz.com/c-programming/examples/lcm
+ * https://www.sanfoundry.com/c-program-integer-to-string-vice-versa/
 */
 
 #include <stdio.h>
@@ -27,20 +28,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <signal.h>
 
 /* Custom modules */
 #include "./modules/headers/calculator.h"
 #include "./modules/headers/fraction.h"
 #include "./modules/headers/udp_module.h"
 #include "./modules/headers/tcp_module.h"
-
+#include "./modules/headers/exit_codes.h"
 
 #define USAGE "./ipcpd -h <host> -p <port> -m <mode>\n"
-
-/* Exit status */
-#define SUCCESS 0
-#define EXIT_FAILURE 1 
-#define ERROR_EXIT_ARGS 2
 
 /* port macros*/
 #define PORT_UNDEFINED -1
@@ -63,6 +60,7 @@ connection_mode_t mode = undef;
 bool verify_ipv4(char * ip);
 bool verify_port(char * port);
 connection_mode_t get_mode(char * mode);
+// void interrupt_handler(int noop);
 
 int main(int argc, char ** argv)
 {   
@@ -105,56 +103,40 @@ int main(int argc, char ** argv)
         return ERROR_EXIT_ARGS;
     }
 
-    // testing_run: make run ARGS="-h 123.123.45.23 -p 01 -m tcp"
-    char * char_arr = (char *)malloc(100*sizeof(char));
-    char * expr = char_arr;
-
-    char c;
-    int idx = 0;
-
-    // #ifdef TEST
-    FILE * fp = fopen("./tests/calc_test.txt","r");
-    
-    while ((c = fgetc(fp)) != EOF)
+    if(mode == udp)
     {
-        expr[idx] = c;
-        idx++;
-        if(c == '\n')
-        {
-            char only_equation[100];
-            strcpy(only_equation,expr);
-            only_equation[strlen(only_equation)-1] = '\0';
-            printf("%s = ",only_equation);
-            print_frac(get_result(&expr));
-            printf("\n");
-            idx = 0;
-            memset(char_arr,0,strlen(char_arr)*sizeof(char));
-        }
+        udp_communication(port);
     }
+    // testing_run: make run ARGS="-h 1127.0.0.1 -p 2023 -m udp"
 
-    fclose(fp);
-    free(char_arr);
-    // #endif
+    // char char_arr[UDP_LIMIT] = {0,};
+    // char * expr = char_arr;
 
-    // frac_t test;
-    // frac_t test2;
-    // test.numerator = 3;
-    // test.denominator = 4;
+    // char c;
+    // int idx = 0;
 
-    // test2.numerator = 4;
-    // test2.denominator = 5;
+    // // #ifdef TEST
+    // FILE * fp = fopen("./tests/calc_test.txt","r");
     
-    // print_frac(frac_add(test,test2));
-    // printf("\n");
-    // print_frac(frac_sub(test,test2));
-    // printf("\n");
-    // print_frac(frac_mul(test,test2));
-    // printf("\n");
-    // print_frac(frac_div(test,test2));
-    // printf("\n");
+    // while ((c = fgetc(fp)) != EOF)
+    // {
+    //     if(idx >= UDP_LIMIT) break;
+    //     expr[idx] = c;
+    //     idx++;
+    //     if(c == '\n')
+    //     {
+    //         char only_equation[100];
+    //         strcpy(only_equation,expr);
+    //         only_equation[strlen(only_equation)-1] = '\0';
+    //         printf("%s = ",only_equation);
+    //         print_frac(get_result(&expr));
+    //         printf("\n");
+    //         idx = 0;
+    //         memset(char_arr,0,strlen(expr)*sizeof(char));
+    //     }
+    // }
 
-    
-
+    // fclose(fp);
     return SUCCESS;
 }
 

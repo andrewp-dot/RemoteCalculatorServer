@@ -13,3 +13,5 @@
 !modules/headers
 !modules/headers/*
 !ipkcpd.c
+!tests
+!tests/*

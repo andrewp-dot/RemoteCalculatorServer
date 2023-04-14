@@ -1,6 +1,4 @@
 #include "../headers/fraction.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 void print_frac(frac_t f)
 {
@@ -60,6 +58,48 @@ frac_t inverted_fraction(frac_t f)
 {
     frac_t inverted = {.numerator = f.denominator, .denominator = f.numerator};
     return inverted;
+}
+
+void num_to_string(int num,char * str)
+{
+    int length = 0;
+    int rem, n;
+
+    n = num;
+    while (n != 0)
+    {
+        length++;
+        n /= 10;
+    }
+    for (int idx = 0; idx < length; idx++)
+    {
+        rem = num % 10;
+        num = num / 10;
+        str[length - (idx + 1)] = rem + '0';
+    }
+    str[length] = '\0';
+    
+}
+
+void frac_to_string(frac_t f, char * str)
+{
+    char * numerator;
+    char * denominator;
+    if(f.denominator == 0) strcpy(str,"0/0");
+    else if(f.denominator == 1) 
+    {
+        num_to_string(f.numerator,numerator);
+        strcpy(str,numerator);
+    }
+    else
+    {
+        num_to_string(f.numerator,numerator);
+        num_to_string(f.denominator,denominator);
+        char * whole_frac;
+        strcat(whole_frac,numerator);
+        strcat(whole_frac,"/");
+        strcat(whole_frac,denominator);
+    }
 }
 
 frac_t frac_add(frac_t op1,frac_t op2)
