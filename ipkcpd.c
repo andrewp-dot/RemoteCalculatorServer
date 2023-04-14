@@ -112,7 +112,7 @@ int main(int argc, char ** argv)
     }
     printf("LOADED: %s\n",expr);
     char * msg[ERR_MSG_LENGTH];
-    printf("RESULT %d\n",get_result(expr));
+    printf("RESULT %d\n",get_result(&expr));
     free(char_arr);
     return SUCCESS;
 }
