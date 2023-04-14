@@ -113,14 +113,15 @@ int main(int argc, char ** argv)
     int idx = 0;
 
     //testing file here
+    FILE * fp = fopen("calc_test.txt","r");
     
-    while ((c = fgetc(stdin)) != EOF)
+    while ((c = fgetc(fp)) != EOF)
     {
         expr[idx] = c;
         idx++;
         if(c == '\n')
         {
-            printf("RESULT: ");
+            printf("%s = ",expr);
             print_frac(get_result(&expr));
             printf("\n");
             idx = 0;
@@ -128,6 +129,7 @@ int main(int argc, char ** argv)
         }
     }
 
+    fclose(fp);
     free(char_arr);
 
     // frac_t test;

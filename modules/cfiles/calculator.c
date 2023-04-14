@@ -64,11 +64,11 @@ operation_t get_operation(char sym)
 token_t get_token(char ** expr)
 {
     token_t current_token;
-    if(isdigit(**expr) || **expr == '-')
+    if(isdigit(**expr) || (**expr == '-' && isdigit(**(expr+1))))
     {
         char buffer[MAX_FLOAT_LENGTH] = {0};
         int idx = 0;
-        if(**expr == '-') 
+        if(**expr == '-' ) 
         {
             buffer[idx++] = '-';
             (*expr)++;
@@ -121,17 +121,14 @@ frac_t compute(frac_t op1,frac_t op2,char operator)
  * note:    it supports only (op E E), where 
  *          op -> operation
  *          E -> expresion
+ * note2:   need to check if the first char in expr is '(', then call get_result
  * @param expr 
  * @param err_msg_buffer 
  * @return float 
  */
-// int get_result(char * expr, char * err_msg_buffer[ERR_MSG_LENGTH])
 frac_t get_result(char ** expr)
 {
-    if(is_number(*expr))
-    {
-        return num_to_frac(atoi(*expr));
-    }
+    if(is_number(*expr)) return num_to_frac(atoi(*expr));
     
     int operand_num = 0;
     frac_t operands[2];
@@ -147,8 +144,7 @@ frac_t get_result(char ** expr)
         {
         case LB:
             current_token = get_token(expr);
-            if(current_token.type != OPERATOR)  return ERR_FRAC;
-            // strcpy(*err_msg_buffer,"Unexpected token.\n");
+            if(current_token.type != OPERATOR) return ERR_FRAC;
             break;
         case OPERATOR:
             operator = current_token.sym;
@@ -166,24 +162,17 @@ frac_t get_result(char ** expr)
             }
             break;
         case OPERAND:
-        case RB:
-            if(current_token.type == OPERAND)
-            {
-                if(operand_num >= 2) 
+            if(operand_num >= 2) 
                 {
                     printf("too many operands\n"); return ERR_FRAC;
                 }
                 operands[operand_num] = num_to_frac(current_token.value);
                 operand_num += 1;
-            }
-            else 
-            {
-                
-                return compute(operands[0],operands[1],operator);
-            }
-            current_token = get_token(expr);
-            // if(current_token.type != SPACE || current_token.type != RB) return ERR;
-            break;
+                current_token = get_token(expr);
+                if(current_token.type != SPACE && current_token.type != RB ) return ERR_FRAC;
+                break;
+        case RB:
+            return compute(operands[0],operands[1],operator);
         default:
             return ERR_FRAC;
         }
