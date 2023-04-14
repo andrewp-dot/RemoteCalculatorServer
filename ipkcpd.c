@@ -107,7 +107,7 @@ int main(int argc, char ** argv)
     {
         udp_communication(port);
     }
-    // testing_run: make run ARGS="-h 1127.0.0.1 -p 2023 -m udp"
+    // testing_run: make run ARGS="-h 127.0.0.1 -p 2023 -m udp"
 
     // char char_arr[UDP_LIMIT] = {0,};
     // char * expr = char_arr;

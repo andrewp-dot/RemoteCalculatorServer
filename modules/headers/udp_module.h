@@ -10,6 +10,7 @@
 #include <stdbool.h>
 
 #define UDP_LIMIT 256
+#define UDP_RESPONSE_OFFSET 3
 
 void udp_interrupt_handler(int noop);
 bool verify_req(char * msg);

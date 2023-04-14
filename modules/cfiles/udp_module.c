@@ -57,24 +57,26 @@ int udp_communication(int port)
 
         //prepare msg
         frac_t result = get_result(&p_buffer);
-        print_frac(result);
         memset(buffer,0,UDP_LIMIT*sizeof(char));
         
-        frac_to_string(result,buffer);
-        
+        char res[100];
+        frac_to_string(result,res);
+        printf("res: %s\n",res);
+
         response_buffer[0] = 1;
-        response_buffer[1] = result.denominator == 0;
-        response_buffer[2] = strlen(buffer);
-        strcat(response_buffer,buffer);
-        
-        int bytes_tx = sendto(server_socket, response_buffer, strlen(response_buffer), 0, cl_address, cl_address_size);
+        response_buffer[1] = (result.denominator == 0);
+        if(response_buffer[1]) strcpy(res,"Unexpected token.");
+        response_buffer[2] = strlen(res);
+        strcpy(response_buffer + UDP_RESPONSE_OFFSET,res);
+
+        printf("0:%d| 1: %d| 2: %d| 3:%s\n",response_buffer[0],response_buffer[1],response_buffer[2],response_buffer + UDP_RESPONSE_OFFSET);
+        int bytes_tx = sendto(server_socket, response_buffer, response_buffer[2] + UDP_RESPONSE_OFFSET, 0, cl_address, cl_address_size);
         if (bytes_tx < 0) 
         {
             perror("ERROR: sendto");
         } 
         memset(response_buffer,0,UDP_LIMIT*sizeof(char));
     }
-
 
     return SUCCESS;
 }

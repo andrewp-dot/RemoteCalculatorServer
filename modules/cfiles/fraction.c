@@ -10,6 +10,8 @@ void print_frac(frac_t f)
 
 int find_gcd(int num1, int num2)
 {
+    if(num1 == 0 || num2 == 0) return 1;
+    
     num1 = ( num1 > 0) ? num1 : -num1;
     num2 = ( num2 > 0) ? num2 : -num2;
 
@@ -83,8 +85,8 @@ void num_to_string(int num,char * str)
 
 void frac_to_string(frac_t f, char * str)
 {
-    char * numerator;
-    char * denominator;
+    char numerator[100];
+    char denominator[100];
     if(f.denominator == 0) strcpy(str,"0/0");
     else if(f.denominator == 1) 
     {
@@ -95,7 +97,7 @@ void frac_to_string(frac_t f, char * str)
     {
         num_to_string(f.numerator,numerator);
         num_to_string(f.denominator,denominator);
-        char * whole_frac;
+        char whole_frac[100];
         strcat(whole_frac,numerator);
         strcat(whole_frac,"/");
         strcat(whole_frac,denominator);

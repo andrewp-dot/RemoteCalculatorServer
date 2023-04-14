@@ -123,6 +123,7 @@ frac_t compute(frac_t op1,frac_t op2,char operator)
  */
 frac_t get_result(char ** expr)
 {
+    printf("EXPR: %s\n");
     if(is_number(*expr)) return num_to_frac(atoi(*expr));
     
     int operand_num = 0;
@@ -152,6 +153,7 @@ frac_t get_result(char ** expr)
             if(current_token.type == LB)
             {
                 operands[operand_num] = get_result(expr);
+                if(operands[operand_num].denominator == 0) return ERR_FRAC;
                 current_token = get_token(expr);  
                 operand_num += 1;
             }
@@ -164,9 +166,18 @@ frac_t get_result(char ** expr)
             operands[operand_num] = num_to_frac(current_token.value);
             operand_num += 1;
             current_token = get_token(expr);
+            if(operand_num == sizeof(operands)/sizeof(frac_t)) 
+            {
+                if(current_token.type != RB) return ERR_FRAC;
+            }
             if(current_token.type != SPACE && current_token.type != RB ) return ERR_FRAC;
             break;
         case RB:
+            if(operand_num == sizeof(operands)/sizeof(frac_t)) 
+            {
+                current_token = get_token(expr);
+                if(current_token.type != RB) return ERR_FRAC;
+            }
             return compute(operands[0],operands[1],operator);
         default:
             return ERR_FRAC;
