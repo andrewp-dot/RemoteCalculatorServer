@@ -64,15 +64,10 @@ operation_t get_operation(char sym)
 token_t get_token(char ** expr)
 {
     token_t current_token;
-    if(isdigit(**expr) || (**expr == '-' && isdigit(**(expr+1))))
+    if(isdigit(**expr))
     {
         char buffer[MAX_FLOAT_LENGTH] = {0};
         int idx = 0;
-        if(**expr == '-' ) 
-        {
-            buffer[idx++] = '-';
-            (*expr)++;
-        }
         while (isdigit(**expr)) 
         {
             buffer[idx] = **expr;

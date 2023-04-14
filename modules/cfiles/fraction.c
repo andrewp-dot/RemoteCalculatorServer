@@ -4,7 +4,10 @@
 
 void print_frac(frac_t f)
 {
-    fprintf(stdout,"%d/%d",f.numerator,f.denominator);
+    if(f.denominator == 1) fprintf(stdout,"%d",f.numerator);
+    else if(f.denominator == 0) fprintf(stdout,"ERR");
+    else fprintf(stdout,"%d/%d",f.numerator,f.denominator);
+    return;
 }
 
 int find_gcd(int num1, int num2)

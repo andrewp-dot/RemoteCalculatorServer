@@ -8,7 +8,7 @@ CFILES=$(CFILES_PATH)/*.c
 OBJDIR=obj
 # compiler settings
 CC=gcc
-CFLAGS=-Wall -Werror -pedantic 
+CFLAGS=-DTEST -Wall -Werror -pedantic
 
 OBJS=$(OBJDIR)/fraction.o $(OBJDIR)/calculator.o $(OBJDIR)/tcp_module.o $(OBJDIR)/udp_module.o $(OBJDIR)/$(MAIN).o
 
@@ -18,7 +18,7 @@ directories:
 	mkdir -p $(OBJDIR)
 
 $(MAIN): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $@
+	$(CC) $(CFLAGS)  $(OBJS) -o $@
 
 $(OBJDIR)/%.o: $(CFILES_PATH)/%.c  $(HEADERS_PATH)/%.h
 	${CC} -c $< -o $@
@@ -33,6 +33,7 @@ run: all
 clean: 
 	rm -rf *.log $(MAIN) $(OBJDIR)
 
-tests:
+tests: 
 	echo Under constraction...
+	
 

@@ -18,6 +18,7 @@ frac_t num_to_frac(int num);
 /* Cosmetic changes */
 void to_basic_shape(frac_t * f);
 frac_t inverted_fraction(frac_t f);
+int convert_to_number(frac_t f);
 
 /* Operations with fractions*/
 frac_t frac_add(frac_t op1,frac_t op2);

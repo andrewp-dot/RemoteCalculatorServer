@@ -112,8 +112,8 @@ int main(int argc, char ** argv)
     char c;
     int idx = 0;
 
-    //testing file here
-    FILE * fp = fopen("calc_test.txt","r");
+    // #ifdef TEST
+    FILE * fp = fopen("./tests/calc_test.txt","r");
     
     while ((c = fgetc(fp)) != EOF)
     {
@@ -121,7 +121,10 @@ int main(int argc, char ** argv)
         idx++;
         if(c == '\n')
         {
-            printf("%s = ",expr);
+            char only_equation[100];
+            strcpy(only_equation,expr);
+            only_equation[strlen(only_equation)-1] = '\0';
+            printf("%s = ",only_equation);
             print_frac(get_result(&expr));
             printf("\n");
             idx = 0;
@@ -131,6 +134,7 @@ int main(int argc, char ** argv)
 
     fclose(fp);
     free(char_arr);
+    // #endif
 
     // frac_t test;
     // frac_t test2;
