@@ -128,7 +128,6 @@ frac_t compute(frac_t op1,frac_t op2,char operator)
 // int get_result(char * expr, char * err_msg_buffer[ERR_MSG_LENGTH])
 frac_t get_result(char ** expr)
 {
-    printf("%s\n",*expr);
     if(is_number(*expr))
     {
         return num_to_frac(atoi(*expr));
@@ -147,27 +146,22 @@ frac_t get_result(char ** expr)
         switch (current_token.type)
         {
         case LB:
-            printf("LB\n");
             current_token = get_token(expr);
             if(current_token.type != OPERATOR)  return ERR_FRAC;
             // strcpy(*err_msg_buffer,"Unexpected token.\n");
             break;
         case OPERATOR:
-            printf("OPERATOR\n");
             operator = current_token.sym;
             current_token = get_token(expr);
             if(current_token.type != SPACE)  return ERR_FRAC;
-            // strcpy(*err_msg_buffer,"Unexpected token.\n");
             break;
         case SPACE:
-            printf("SPACE\n");
             current_token = get_token(expr);
             if(current_token.type != OPERAND && current_token.type != LB) return ERR_FRAC;
             if(current_token.type == LB)
             {
                 operands[operand_num] = get_result(expr);
-                current_token = get_token(expr); //tokeny zanechava pôvodne, 
-                //treba aktualizovat pointer, na miesto a pokracovt v tokenizovani
+                current_token = get_token(expr);  
                 operand_num += 1;
             }
             break;
@@ -175,7 +169,6 @@ frac_t get_result(char ** expr)
         case RB:
             if(current_token.type == OPERAND)
             {
-                printf("OPERAND\n");
                 if(operand_num >= 2) 
                 {
                     printf("too many operands\n"); return ERR_FRAC;
@@ -185,21 +178,15 @@ frac_t get_result(char ** expr)
             }
             else 
             {
-                printf("RB\n");
                 
                 return compute(operands[0],operands[1],operator);
             }
             current_token = get_token(expr);
             // if(current_token.type != SPACE || current_token.type != RB) return ERR;
-            // strcpy(*err_msg_buffer,"Unexpected token.\n");
             break;
-        // case NEWLINE:
-        //     return compute(operands[0],operands[1],operator);
         default:
-            // strcpy(*err_msg_buffer,"Unexpected token.\n");
             return ERR_FRAC;
         }
     }
-    // printf("op0: %d op1: %d operator: %c \n",operands[0],operands[1],operator);
     return compute(operands[0],operands[1],operator);
 }

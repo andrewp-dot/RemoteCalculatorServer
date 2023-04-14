@@ -111,17 +111,22 @@ int main(int argc, char ** argv)
 
     char c;
     int idx = 0;
+
+    //testing file here
     
-    while ((c = getchar()) != EOF)
+    while ((c = fgetc(stdin)) != EOF)
     {
         expr[idx] = c;
         idx++;
+        if(c == '\n')
+        {
+            printf("RESULT: ");
+            print_frac(get_result(&expr));
+            printf("\n");
+            idx = 0;
+            memset(char_arr,0,strlen(char_arr)*sizeof(char));
+        }
     }
-    printf("LOADED: %s\n",expr);
-    char * msg[ERR_MSG_LENGTH];
-    printf("RESULT: ");
-    print_frac(get_result(&expr));
-    printf("\n");
 
     free(char_arr);
 
