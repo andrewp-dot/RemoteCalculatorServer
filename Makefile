@@ -10,7 +10,7 @@ OBJDIR=obj
 CC=gcc
 CFLAGS=-Wall -Werror -pedantic 
 
-OBJS=$(OBJDIR)/calculator.o $(OBJDIR)/tcp_module.o $(OBJDIR)/udp_module.o $(OBJDIR)/$(MAIN).o
+OBJS=$(OBJDIR)/fraction.o $(OBJDIR)/calculator.o $(OBJDIR)/tcp_module.o $(OBJDIR)/udp_module.o $(OBJDIR)/$(MAIN).o
 
 all: directories $(MAIN)
 

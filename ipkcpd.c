@@ -1,6 +1,6 @@
 /*
 <one line to give the program's name and a brief idea of what it does.>
-Copyright (C) 2023  Adrián Ponechal
+Copyright (C) 2023  Adrián Ponechal (xpone01@stud.fit.vutbr.cz)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,6 +16,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+/**
+ * SOURCES:
+ * https://www.programiz.com/c-programming/examples/hcf-gcd
+ * https://www.programiz.com/c-programming/examples/lcm
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,6 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /* Custom modules */
 #include "./modules/headers/calculator.h"
+#include "./modules/headers/fraction.h"
 #include "./modules/headers/udp_module.h"
 #include "./modules/headers/tcp_module.h"
 
@@ -99,21 +106,46 @@ int main(int argc, char ** argv)
     }
 
     // testing_run: make run ARGS="-h 123.123.45.23 -p 01 -m tcp"
-    char * char_arr = (char *)malloc(100*sizeof(char));
-    char * expr = char_arr;
+    // char * char_arr = (char *)malloc(100*sizeof(char));
+    // char * expr = char_arr;
 
-    char c;
-    int idx = 0;
+    // char c;
+    // int idx = 0;
     
-    while ((c = getchar()) != EOF)
-    {
-        expr[idx] = c;
-        idx++;
-    }
-    printf("LOADED: %s\n",expr);
-    char * msg[ERR_MSG_LENGTH];
-    printf("RESULT %d\n",get_result(&expr));
-    free(char_arr);
+    // while ((c = getchar()) != EOF)
+    // {
+    //     expr[idx] = c;
+    //     idx++;
+    // }
+    // printf("LOADED: %s\n",expr);
+    // char * msg[ERR_MSG_LENGTH];
+    // printf("RESULT %d\n",get_result(&expr));
+    // free(char_arr);
+
+    // frac_t test;
+    // frac_t test2;
+    // test.numerator = 3;
+    // test.denominator = 4;
+
+    // test2.numerator = 4;
+    // test2.denominator = 5;
+    // print_frac(test);
+    // printf("F2: ");
+    // print_frac(test2);
+    // printf("\n");
+    
+    // to_same_dominator(&test,&test2);
+
+    // print_frac(test);
+    // printf("F2: ");
+    // print_frac(test2);
+    // printf("\nF2:");
+
+    // invert_fraction(&test2);
+
+    // print_frac(test2);
+    // printf("\n");
+
     return SUCCESS;
 }
 

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "fraction.h"
 
 #define ERR_MSG_LENGTH 128
 #define MAX_FLOAT_LENGTH 100
@@ -38,6 +39,5 @@ bool is_operation(char op);
 operation_t get_operation(char sym);
 token_t get_token(char ** expr);
 int compute(int op1,int op2,char operator);
-// int get_result(char * expr,char * err_msg_buffer[ERR_MSG_LENGTH]);
 int get_result(char ** expr);
 #endif
