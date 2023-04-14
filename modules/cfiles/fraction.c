@@ -38,6 +38,14 @@ void to_same_dominator(frac_t * op1, frac_t *op2)
     (*op2).denominator *= op1_original_denominator;
 }
 
+frac_t num_to_frac(int num)
+{
+    frac_t result;
+    result.numerator = num;
+    result.denominator = 1;
+    return result;
+}
+
 void to_basic_shape(frac_t * f)
 {
     int gcd = find_gcd(f->numerator,f->denominator);
@@ -45,11 +53,10 @@ void to_basic_shape(frac_t * f)
     (*f).denominator /= gcd;
 }
 
-void invert_fraction(frac_t * f)
+frac_t inverted_fraction(frac_t f)
 {
-    int temp = f->numerator;
-    (*f).numerator = (*f).denominator;
-    (*f).denominator = temp;
+    frac_t inverted = {.numerator = f.denominator, .denominator = f.numerator};
+    return inverted;
 }
 
 frac_t frac_add(frac_t op1,frac_t op2)
@@ -75,14 +82,13 @@ frac_t frac_sub(frac_t op1,frac_t op2)
 frac_t frac_mul(frac_t op1,frac_t op2)
 {
     frac_t result;
-    result.numerator = op1.numerator * op2.denominator;
+    result.numerator = op1.numerator * op2.numerator;
     result.denominator = op1.denominator * op2.denominator;
     to_basic_shape(&result);
     return result;
 }
 
 frac_t frac_div(frac_t op1,frac_t op2)
-{
-    invert_fraction(&op2);
-    return frac_mul(op1,op2);
+{   
+    return frac_mul(op1,inverted_fraction(op2));
 }

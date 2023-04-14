@@ -38,6 +38,6 @@ bool is_number(char * num);
 bool is_operation(char op);
 operation_t get_operation(char sym);
 token_t get_token(char ** expr);
-int compute(int op1,int op2,char operator);
-int get_result(char ** expr);
+frac_t compute(frac_t op1,frac_t op2,char operator);
+frac_t get_result(char ** expr);
 #endif

@@ -106,21 +106,24 @@ int main(int argc, char ** argv)
     }
 
     // testing_run: make run ARGS="-h 123.123.45.23 -p 01 -m tcp"
-    // char * char_arr = (char *)malloc(100*sizeof(char));
-    // char * expr = char_arr;
+    char * char_arr = (char *)malloc(100*sizeof(char));
+    char * expr = char_arr;
 
-    // char c;
-    // int idx = 0;
+    char c;
+    int idx = 0;
     
-    // while ((c = getchar()) != EOF)
-    // {
-    //     expr[idx] = c;
-    //     idx++;
-    // }
-    // printf("LOADED: %s\n",expr);
-    // char * msg[ERR_MSG_LENGTH];
-    // printf("RESULT %d\n",get_result(&expr));
-    // free(char_arr);
+    while ((c = getchar()) != EOF)
+    {
+        expr[idx] = c;
+        idx++;
+    }
+    printf("LOADED: %s\n",expr);
+    char * msg[ERR_MSG_LENGTH];
+    printf("RESULT: ");
+    print_frac(get_result(&expr));
+    printf("\n");
+
+    free(char_arr);
 
     // frac_t test;
     // frac_t test2;
@@ -129,22 +132,17 @@ int main(int argc, char ** argv)
 
     // test2.numerator = 4;
     // test2.denominator = 5;
-    // print_frac(test);
-    // printf("F2: ");
-    // print_frac(test2);
-    // printf("\n");
     
-    // to_same_dominator(&test,&test2);
-
-    // print_frac(test);
-    // printf("F2: ");
-    // print_frac(test2);
-    // printf("\nF2:");
-
-    // invert_fraction(&test2);
-
-    // print_frac(test2);
+    // print_frac(frac_add(test,test2));
     // printf("\n");
+    // print_frac(frac_sub(test,test2));
+    // printf("\n");
+    // print_frac(frac_mul(test,test2));
+    // printf("\n");
+    // print_frac(frac_div(test,test2));
+    // printf("\n");
+
+    
 
     return SUCCESS;
 }
