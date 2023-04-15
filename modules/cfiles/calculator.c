@@ -123,10 +123,14 @@ frac_t compute(frac_t op1,frac_t op2,char operator)
  */
 frac_t get_result(char ** expr)
 {
-    printf("EXPR: %s\n");
+    printf("EXPR: %s\n",*expr);
     if(is_number(*expr)) return num_to_frac(atoi(*expr));
-    
+
+    bool LB_found = false;
+    bool RB_found = false;
+
     int operand_num = 0;
+    //use dynamic arr for multiple operands support
     frac_t operands[2];
     operands[0] = ERR_FRAC;
     operands[1] = ERR_FRAC;
@@ -134,11 +138,17 @@ frac_t get_result(char ** expr)
     
     token_t current_token = get_token(expr);
     
-    while (**expr != '\0')
+    while (current_token.type != NEWLINE)
     {
         switch (current_token.type)
         {
         case LB:
+            if(LB_found) 
+            {
+                return ERR_FRAC;
+            }
+            else LB_found = true;
+
             current_token = get_token(expr);
             if(current_token.type != OPERATOR) return ERR_FRAC;
             break;
@@ -173,11 +183,18 @@ frac_t get_result(char ** expr)
             if(current_token.type != SPACE && current_token.type != RB ) return ERR_FRAC;
             break;
         case RB:
-            if(operand_num == sizeof(operands)/sizeof(frac_t)) 
+            if(RB_found)
             {
-                current_token = get_token(expr);
-                if(current_token.type != RB) return ERR_FRAC;
+                return ERR_FRAC;
             }
+            RB_found = true; 
+            // if(operand_num == sizeof(operands)/sizeof(frac_t)) 
+            // {
+            //     current_token = get_token(expr);
+            //     printf("before comp: %d\n",current_token.sym);
+            //     current_token = get_token(expr);
+            //     printf("before comp: %d\n",current_token.sym);
+            // }
             return compute(operands[0],operands[1],operator);
         default:
             return ERR_FRAC;

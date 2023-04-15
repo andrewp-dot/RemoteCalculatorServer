@@ -7,6 +7,13 @@ void udp_interrupt_handler(int noop)
     exit(SUCCESS);
 }
 
+bool verify_req(char * msg)
+{
+    if(msg == NULL) return false;
+    if(msg[0] != 0 || msg[2] != '(') return false;
+    return true;
+}
+
 int udp_communication(int port)
 {
     // char * arr = NULL;
@@ -51,17 +58,19 @@ int udp_communication(int port)
             perror("ERROR: recvfrom");
         }
 
-        //validation
-        printf("RECIEVED: %s\n",++p_buffer);    
-        ++p_buffer;
+        char res[100];
+        frac_t result = ERR_FRAC;
+        if(verify_req(p_buffer)) 
+        {
+            p_buffer += UDP_REQUEST_OFFSET;
+            result = get_result(&p_buffer);
+            frac_to_string(result,res);
+        }
+        else  p_buffer += UDP_REQUEST_OFFSET;
 
-        //prepare msg
-        frac_t result = get_result(&p_buffer);
         memset(buffer,0,UDP_LIMIT*sizeof(char));
         
-        char res[100];
-        frac_to_string(result,res);
-        printf("res: %s\n",res);
+        // printf("res: %s\n",res);
 
         response_buffer[0] = 1;
         response_buffer[1] = (result.denominator == 0);

@@ -11,6 +11,7 @@
 
 #define UDP_LIMIT 256
 #define UDP_RESPONSE_OFFSET 3
+#define UDP_REQUEST_OFFSET 2
 
 void udp_interrupt_handler(int noop);
 bool verify_req(char * msg);
