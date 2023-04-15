@@ -1,24 +1,21 @@
 #include "../headers/udp_module.h"
-#include "../headers/exit_codes.h"
 #include "../headers/calculator.h"
 
-void udp_interrupt_handler(int noop)
-{
-    exit(SUCCESS);
-}
-
-bool verify_req(char * msg)
+bool udp_verify_req(char * msg)
 {
     if(msg == NULL) return false;
     if(msg[0] != 0 || msg[2] != '(') return false;
     return true;
 }
 
+void udp_interrupt_handler(int * socket)
+{
+    close(*socket);
+}
+
 int udp_communication(int port)
 {
     // char * arr = NULL;
-    signal(SIGINT,udp_interrupt_handler);
-    signal(SIGTERM,udp_interrupt_handler);
     int server_socket = socket(AF_INET, SOCK_DGRAM, 0); if (server_socket <= 0)
     {
         perror("ERROR: socket");
@@ -60,7 +57,7 @@ int udp_communication(int port)
 
         char res[100];
         frac_t result = ERR_FRAC;
-        if(verify_req(p_buffer)) 
+        if(udp_verify_req(p_buffer)) 
         {
             p_buffer += UDP_REQUEST_OFFSET;
             result = get_result(&p_buffer);

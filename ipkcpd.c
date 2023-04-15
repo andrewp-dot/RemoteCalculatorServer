@@ -35,35 +35,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "./modules/headers/fraction.h"
 #include "./modules/headers/udp_module.h"
 #include "./modules/headers/tcp_module.h"
-#include "./modules/headers/exit_codes.h"
+#include "./modules/headers/ipkcpd.h"
 
-#define USAGE "./ipcpd -h <host> -p <port> -m <mode>\n"
-
-/* port macros*/
-#define PORT_UNDEFINED -1
-#define MAX_PORT 65535
-
-/* ipv4 macros */
-#define IPV4_LENGTH 16 //255.255.255.255\0
-#define IP_PART_LIMIT 255
-
-typedef enum connection_mode{
-    tcp,
-    udp,
-    undef
-}connection_mode_t;
-
+// void interrupt_handler(int noop);
 int port = PORT_UNDEFINED;
 connection_mode_t mode = undef;
 
-/* FUNCTION DECLARTIONS */
-bool verify_ipv4(char * ip);
-bool verify_port(char * port);
-connection_mode_t get_mode(char * mode);
-// void interrupt_handler(int noop);
-
 int main(int argc, char ** argv)
 {   
+    signal(SIGINT,close_connection);
+    signal(SIGTERM,close_connection);
     char ip_address[IPV4_LENGTH] = {0};
 
     /* load args */
@@ -103,10 +84,8 @@ int main(int argc, char ** argv)
         return ERROR_EXIT_ARGS;
     }
 
-    if(mode == udp)
-    {
-        udp_communication(port);
-    }
+    
+
     // testing_run: make run ARGS="-h 127.0.0.1 -p 2023 -m udp"
 
     // char char_arr[UDP_LIMIT] = {0,};
@@ -137,6 +116,8 @@ int main(int argc, char ** argv)
     // }
 
     // fclose(fp);
+    if(mode == udp) return udp_communication(port);
+    else if(mode == tcp) return tcp_communication(port);
     return SUCCESS;
 }
 
@@ -184,3 +165,5 @@ connection_mode_t get_mode(char * mode)
     else if(!strcmp("udp",mode)) return udp;
     else return undef;
 }
+
+void close_connection(int num) {}
