@@ -13,6 +13,15 @@ void udp_interrupt_handler(int * socket)
     close(*socket);
 }
 
+void udp_setup_msg(char * buffer, char * res,int status)
+{
+    buffer[0] = RESPONSE;
+    buffer[1] = status == CONNECTION_MSG_OK ? CONNECTION_MSG_OK : CONNECTION_MSG_ERR;
+    if(buffer[1] == CONNECTION_MSG_ERR) strcpy(res,"Unexpected token.");
+    buffer[2] = strlen(res);
+    strcpy(buffer + UDP_RESPONSE_OFFSET,res);
+}
+
 int udp_communication(int port)
 {
     // char * arr = NULL;
@@ -55,7 +64,7 @@ int udp_communication(int port)
             perror("ERROR: recvfrom");
         }
 
-        char res[100];
+        char res[UDP_BUFFER_RESULT_LIMIT];
         frac_t result = ERR_FRAC;
         if(udp_verify_req(p_buffer)) 
         {
@@ -65,17 +74,11 @@ int udp_communication(int port)
         }
         else  p_buffer += UDP_REQUEST_OFFSET;
 
-        memset(buffer,0,UDP_LIMIT*sizeof(char));
+        memset(buffer,0,UDP_LIMIT);
         
-        // printf("res: %s\n",res);
+        udp_setup_msg(response_buffer,res,result.denominator == 0);
 
-        response_buffer[0] = 1;
-        response_buffer[1] = (result.denominator == 0);
-        if(response_buffer[1]) strcpy(res,"Unexpected token.");
-        response_buffer[2] = strlen(res);
-        strcpy(response_buffer + UDP_RESPONSE_OFFSET,res);
-
-        printf("0:%d| 1: %d| 2: %d| 3:%s\n",response_buffer[0],response_buffer[1],response_buffer[2],response_buffer + UDP_RESPONSE_OFFSET);
+        //printf("0:%d| 1: %d| 2: %d| 3:%s\n",response_buffer[0],response_buffer[1],response_buffer[2],response_buffer + UDP_RESPONSE_OFFSET);
         int bytes_tx = sendto(server_socket, response_buffer, response_buffer[2] + UDP_RESPONSE_OFFSET, 0, cl_address, cl_address_size);
         if (bytes_tx < 0) 
         {

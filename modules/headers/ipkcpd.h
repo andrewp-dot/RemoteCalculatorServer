@@ -16,6 +16,12 @@
 #define IPV4_LENGTH 16 //255.255.255.255\0
 #define IP_PART_LIMIT 255
 
+/* Msg macros */
+#define REQUEST 0
+#define RESPONSE 1
+#define CONNECTION_MSG_OK 0
+#define CONNECTION_MSG_ERR 1
+
 typedef enum connection_mode{
     tcp,
     udp,

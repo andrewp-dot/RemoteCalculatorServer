@@ -166,4 +166,7 @@ connection_mode_t get_mode(char * mode)
     else return undef;
 }
 
-void close_connection(int num) {}
+void close_connection(int num) 
+{
+    exit(SUCCESS);
+}
