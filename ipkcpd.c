@@ -16,13 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/**
- * SOURCES:
- * https://www.programiz.com/c-programming/examples/hcf-gcd
- * https://www.programiz.com/c-programming/examples/lcm
- * https://www.sanfoundry.com/c-program-integer-to-string-vice-versa/
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,44 +72,54 @@ int main(int argc, char ** argv)
 
         }
     }
+
     if(port == PORT_UNDEFINED || strlen(ip_address) == 0 || mode == undef)
     {
         fprintf(stderr, "Undefined required parameters.\n%s",USAGE);
         return ERROR_EXIT_ARGS;
     }
 
+    #ifdef TEST_CALC
+    char char_arr[UDP_LIMIT] = {0,};
+    char * expr = char_arr;
+
+    char c;
+    int idx = 0;
+
+    // #ifdef TEST_CALC
+    FILE * fp = fopen("./tests/calc_test.txt","r");
     
+    while ((c = fgetc(fp)) != EOF)
+    {
+        if(idx >= UDP_LIMIT) break;
+        expr[idx] = c;
+        idx++;
+        if(c == '\n')
+        {
+            char only_equation[100];
+            char res[100];
+            strcpy(only_equation,expr);
+            only_equation[strlen(only_equation)-1] = '\0';
+            printf("%s = ",only_equation);
+            frac_t result = get_result(&expr);
+            if(result.denominator == 0) strcpy(res,"ERR");
+            else frac_to_string_floored(result,res);
+            printf("%s",res);
+            printf("\n");
+            idx = 0;
+            memset(char_arr,0,strlen(expr));
+            memset(res,0,strlen(expr));
+        }
+    }
 
-    // testing_run: make run ARGS="-h 127.0.0.1 -p 2023 -m udp"
+    fclose(fp);
+    return SUCCESS;
+    #endif
 
-    // char char_arr[UDP_LIMIT] = {0,};
-    // char * expr = char_arr;
+    #ifdef TEST_ARGS
+    return SUCCESS;
+    #endif
 
-    // char c;
-    // int idx = 0;
-
-    // // #ifdef TEST
-    // FILE * fp = fopen("./tests/calc_test.txt","r");
-    
-    // while ((c = fgetc(fp)) != EOF)
-    // {
-    //     if(idx >= UDP_LIMIT) break;
-    //     expr[idx] = c;
-    //     idx++;
-    //     if(c == '\n')
-    //     {
-    //         char only_equation[100];
-    //         strcpy(only_equation,expr);
-    //         only_equation[strlen(only_equation)-1] = '\0';
-    //         printf("%s = ",only_equation);
-    //         print_frac(get_result(&expr));
-    //         printf("\n");
-    //         idx = 0;
-    //         memset(char_arr,0,strlen(expr)*sizeof(char));
-    //     }
-    // }
-
-    // fclose(fp);
     if(mode == udp) return udp_communication(port);
     else if(mode == tcp) return tcp_communication(port);
     return SUCCESS;
@@ -143,7 +146,7 @@ bool verify_ipv4(char * ip)
         if(*ip == '\0') break;
         ip += 1;
         ip_parts_count += 1;
-        if(ip_parts_count > 4 || atoi(ip_part) > IP_PART_LIMIT || atoi(ip_part) < 0) return false;
+        if(ip_parts_count >= 4 || atoi(ip_part) > IP_PART_LIMIT || atoi(ip_part) < 0) return false;
     }
     return true;
 }
@@ -151,12 +154,14 @@ bool verify_ipv4(char * ip)
 bool verify_port(char * port)
 {
     if (port == NULL) return false;
+    char * start = port;
     while (*port != '\0')
     {
         if(!isdigit(*port)) return false;
         port += 1;
     }
-    if(atoi(port) > MAX_PORT || atoi(port) < 0) return false;
+    if(atoi(start) > MAX_PORT || atoi(start) < 0) return false;
+    
     return true;
 }
 

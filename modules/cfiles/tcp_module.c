@@ -167,8 +167,8 @@ int tcp_communication(int port)
                     req_is_ok = tcp_verify_req(p_req_buffer);
                     p_req_buffer += (int)strlen("SOLVE ");
                     frac_t result = get_result(&(p_req_buffer));
-                    frac_to_string(result,res);
-                    tcp_setup_msg(response_buffer,res, result.denominator == 0 && req_is_ok,"RESULT ");
+                    frac_to_string_floored(result,res);
+                    tcp_setup_msg(response_buffer,res, result.denominator == 0 || req_is_ok,"RESULT ");
                 }
                 memset(p_req_buffer,0,TCP_LIMIT);
 

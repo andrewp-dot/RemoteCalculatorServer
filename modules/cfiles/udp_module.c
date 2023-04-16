@@ -76,7 +76,7 @@ int udp_communication(int port)
         {
             p_buffer += UDP_REQUEST_OFFSET;
             result = get_result(&p_buffer);
-            frac_to_string(result,res);
+            frac_to_string_floored(result,res);
         }
         else  p_buffer += UDP_REQUEST_OFFSET;
 

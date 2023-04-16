@@ -24,6 +24,7 @@ void to_basic_shape(frac_t * f);
 frac_t inverted_fraction(frac_t f);
 void num_to_string(int num,char * str);
 void frac_to_string(frac_t f, char * str);
+void frac_to_string_floored(frac_t f,char * str);
 
 /* Operations with fractions*/
 frac_t frac_add(frac_t op1,frac_t op2);

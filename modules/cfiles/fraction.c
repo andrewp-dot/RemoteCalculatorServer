@@ -67,6 +67,11 @@ void num_to_string(int num,char * str)
     int length = 0;
     int rem, n;
 
+    if(num == 0)
+    {
+        strcpy(str,"0");
+        return;
+    }
     n = num;
     while (n != 0)
     {
@@ -79,6 +84,7 @@ void num_to_string(int num,char * str)
         num = num / 10;
         str[length - (idx + 1)] = rem + '0';
     }
+
     str[length] = '\0';
     
 }
@@ -102,6 +108,15 @@ void frac_to_string(frac_t f, char * str)
         strcat(whole_frac,"/");
         strcat(whole_frac,denominator);
     }
+}
+
+void frac_to_string_floored(frac_t f,char * str)
+{
+    if(f.denominator == 0) return;
+    int floored_result = f.numerator / f.denominator;
+    char floored_result_string[100] = {0,};
+    num_to_string(floored_result,floored_result_string);
+    strcpy(str,floored_result_string);
 }
 
 frac_t frac_add(frac_t op1,frac_t op2)

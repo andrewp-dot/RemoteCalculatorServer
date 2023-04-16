@@ -2,6 +2,14 @@
 #include <string.h>
 #include <ctype.h>
 
+/**
+ * TODO:
+ * Edit: compute function
+ * Edit: get_result function
+ * add support for multiple operands
+ * improve syntax checking
+ */
+
 /* temporary functions */
 void print_token_type(token_t token)
 {
@@ -123,7 +131,7 @@ frac_t compute(frac_t op1,frac_t op2,char operator)
  */
 frac_t get_result(char ** expr)
 {
-    printf("EXPR: %s\n",*expr);
+    // printf("EXPR: %s\n",*expr);
     if(is_number(*expr)) return num_to_frac(atoi(*expr));
 
     bool LB_found = false;
@@ -195,7 +203,10 @@ frac_t get_result(char ** expr)
             //     current_token = get_token(expr);
             //     printf("before comp: %d\n",current_token.sym);
             // }
-            return compute(operands[0],operands[1],operator);
+            frac_t result = compute(operands[0],operands[1],operator);
+            int floor_result = result.numerator / result.denominator;
+            if(floor_result >= 0) return result;
+            return ERR_FRAC;
         default:
             return ERR_FRAC;
         }

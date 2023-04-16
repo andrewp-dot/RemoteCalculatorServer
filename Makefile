@@ -6,9 +6,16 @@ CFILES_PATH=modules/cfiles
 HEADERS=$(CFILES_PATH)/*.h
 CFILES=$(CFILES_PATH)/*.c
 OBJDIR=obj
+
+LOGIN=xponec01
+
+DEBUG_MACRO=NONE
+# DEBUG_MACRO=TEST_CALC
+# DEBUG_MACRO=TEST_ARGS
+
 # compiler settings
 CC=gcc
-CFLAGS=-DTEST -Wall -Werror -pedantic
+CFLAGS=-Wall -Werror -pedantic
 
 OBJS=$(OBJDIR)/fraction.o $(OBJDIR)/calculator.o $(OBJDIR)/tcp_module.o $(OBJDIR)/udp_module.o $(OBJDIR)/$(MAIN).o
 
@@ -24,7 +31,7 @@ $(OBJDIR)/%.o: $(CFILES_PATH)/%.c  $(HEADERS_PATH)/%.h
 	${CC} -c $< -o $@
 
 $(OBJDIR)/$(MAIN).o: $(MAIN).c
-	${CC} -c $< -o $@
+	${CC} -D$(DEBUG_MACRO) -c $< -o $@
 
 run: all
 	./$(MAIN) $(ARGS)
@@ -33,7 +40,13 @@ run: all
 clean: 
 	rm -rf *.log $(MAIN) $(OBJDIR)
 
-tests: 
-	echo Under constraction...
+zip:
+	zip -r $(LOGIN).zip Makefile LICENSE README.md ipkcpd.c modules/* tests/*
+
+arg_test:
+	make clean
+	make DEBUG_MACRO="TEST_ARGS" 
+	python3 test_inputs.py
+
 	
 
