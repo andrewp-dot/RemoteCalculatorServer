@@ -26,11 +26,6 @@ Základná štruktúra:
 Hlavný prvok programu využíva moduly definované v zložke <code>modules/headers/</code>
 a implementované zložke <code>modules/cfiles/</code>. V tomto module sa nachádza funkcia main, ktorá overuje správnosť zadaných parametrov a spúšťa funcionalitu na základe nich.
 
-### Makefile
-
-Tento súbor slúži pre kompiláciu, testovanie a zipovanie programu do archívu.
-Pre testovanie a základné použitie je možné zavolať v termináli <code>make help</code>
-
 ### modules/\*
 
 V tejto zložke sa nachádzajú práve 2 podzložky - <code>modules/headers</code> a <code>modules/cfiles</code>. V zložke "headers" sú hlavičkové súbory jednotlivých modulov. Nachádzajú sa tu 5 hlavných moduly
