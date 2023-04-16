@@ -27,4 +27,6 @@
 
 <a id="3">[3]</a> _C Program to Convert Integer to String and Vice-versa_ \[online\], https://www.sanfoundry.com/c-program-integer-to-string-vice-versa/
 
-<a id="4">[4]</a> Dolejška, Koutenský, _Programování síťových aplikací IPK 2022/2023 L_ , \[online\]
+<a id="4">[4]</a> D. Dolejška, M. Koutenský, _Programování síťových aplikací IPK 2022/2023 L_ , \[online\]
+
+<a id="4">[5]</a> _Using poll() instead of select()_, naposledy aktualizované 31.8.2021 ,\[online\],https://www.ibm.com/docs/en/i/7.1?topic=designs-using-poll-instead-select

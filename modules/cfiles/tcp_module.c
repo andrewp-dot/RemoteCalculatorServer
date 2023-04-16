@@ -36,6 +36,24 @@ void tcp_setup_msg(char * msg,char * res,int status,const char * MSG)
     else strcpy(msg,"BYE\n");
 }
 
+void tcp_update_fds(struct pollfd * fds,int * number_of_fds)
+{
+    for (int idx = 0; idx < *number_of_fds; idx++)
+    {
+        if(fds[idx].fd == -1)
+        {
+            //move it to the left
+            for(int move = idx; move < *number_of_fds; move++)
+            {
+                fds[move].fd = fds[move + 1].fd;
+            }
+            //bcs we moved elements, so we did not check the one on idx
+            idx -= 1;
+            *number_of_fds -= 1;
+        }
+    }
+}
+
 int tcp_communication(int port)
 {
     // set up
@@ -53,7 +71,7 @@ int tcp_communication(int port)
     int flags = fcntl(server_socket, F_SETFL, 0);
     int rc = fcntl(server_socket, F_SETFL, flags | O_NONBLOCK);
 
-    //bind 
+    //bind FUNCTION
     unsigned short server_port = port; 
     struct sockaddr_in server_addr; 
     memset(&server_addr, 0, sizeof(server_addr));
@@ -84,7 +102,6 @@ int tcp_communication(int port)
     bool said_hi[SERVER_CLIENT_LIMIT] = {false,};
     bool fds_closed[SERVER_CLIENT_LIMIT] = {false,};
     bool close_all = false;
-    bool update_fds = false;
 
     polled_fds[0].fd = server_socket;
     polled_fds[0].events = POLLIN;
@@ -154,7 +171,8 @@ int tcp_communication(int port)
                     tcp_setup_msg(response_buffer,res, result.denominator == 0 && req_is_ok,"RESULT ");
                 }
                 memset(p_req_buffer,0,TCP_LIMIT);
-                ready_socket = send(polled_fds[idx].fd, response_buffer, TCP_LIMIT, flags); 
+
+                ready_socket = send(polled_fds[idx].fd, response_buffer, strlen(response_buffer), flags); 
                 if (ready_socket <= 0) {
                     perror("ERROR: send");
                     fds_closed[idx] = true;
@@ -163,32 +181,14 @@ int tcp_communication(int port)
 
                 if(fds_closed[idx])
                 {
-                    close(fds_closed[idx]);
+                    close(polled_fds[idx].fd);
                     // remove descriptor
                     polled_fds[idx].fd = -1;
                     fds_closed[idx] = false;
                     said_hi[idx] = false;
-                    update_fds = true;
+                    tcp_update_fds(polled_fds,&nfds);
                 }
-                if(update_fds)
-                {
-                    update_fds = false;
-                    for (int idx = 0; idx < nfds; idx++)
-                    {
-                        if(polled_fds[idx].fd == -1)
-                        {
-                            //move it to the left
-                            for(int move = idx; move < nfds; move++)
-                            {
-                                polled_fds[move].fd = polled_fds[move + 1].fd;
-                            }
-                            //bcs we moved elements, so we did not check the one on idx
-                            idx -= 1;
-                            nfds -= 1;
-                        }
-                    }
-                    
-                }
+
 
             }
             if(close_all) 
