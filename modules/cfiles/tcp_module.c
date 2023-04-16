@@ -3,8 +3,8 @@
 
 void tcp_interrupt_handler(int noop)
 {
-    shutdown(g_socket, SHUT_RDWR);
-    close(g_socket);
+    shutdown(*g_socket, SHUT_RDWR);
+    close(*g_socket);
     exit(SUCCESS);
 }
 
@@ -38,17 +38,22 @@ void tcp_setup_msg(char * msg,char * res,int status,const char * MSG)
 
 int tcp_communication(int port)
 {
-
+    // set up
     int family = AF_INET;
     int type = SOCK_STREAM;
-    int welcome_socket = socket(family, type, 0); if (welcome_socket <= 0)
+    int server_socket = socket(family, type, 0); 
+    g_socket = &server_socket;
+    if (server_socket <= 0)
     {
         perror("ERROR: socket");
         exit(EXIT_FAILURE); 
     }
     int enable = 1;
-    setsockopt(welcome_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
+    setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
+    int flags = fcntl(server_socket, F_SETFL, 0);
+    int rc = fcntl(server_socket, F_SETFL, flags | O_NONBLOCK);
 
+    //bind 
     unsigned short server_port = port; 
     struct sockaddr_in server_addr; 
     memset(&server_addr, 0, sizeof(server_addr));
@@ -58,78 +63,145 @@ int tcp_communication(int port)
     server_addr.sin_port = htons(port);
 
     struct sockaddr *address = (struct sockaddr *) &server_addr; int address_size = sizeof(server_addr);
-    if (bind(welcome_socket, address, address_size) < 0) {
+    if (bind(server_socket, address, address_size) < 0) {
         perror("ERROR: bind");
         exit(EXIT_FAILURE);
     }
 
-    int max_waiting_connections = 1;
-    if (listen(welcome_socket, max_waiting_connections) < 0) {
+    int nfds = SERVER_CLIENT_LIMIT;
+    struct pollfd *polled_fds;
+    polled_fds = calloc(nfds, sizeof(struct pollfd)); 
+
+    int max_waiting_connections = SERVER_CLIENT_LIMIT;
+    if (listen(server_socket, max_waiting_connections) < 0) {
         perror("ERROR: listen");
         exit(EXIT_FAILURE);
     }
 
-    struct sockaddr *comm_addr;
-    socklen_t comm_addr_size;
+    int updated_num_fds = 0;
+    int ready_socket;
+    int new_socket = -1;
+    bool said_hi[SERVER_CLIENT_LIMIT] = {false,};
+    bool fds_closed[SERVER_CLIENT_LIMIT] = {false,};
+    bool close_all = false;
+    bool update_fds = false;
+
+    polled_fds[0].fd = server_socket;
+    polled_fds[0].events = POLLIN;
 
     char request_buffer[TCP_LIMIT];
     char * p_req_buffer = request_buffer;
     char response_buffer[TCP_LIMIT]; 
 
-
-    bool hello_sent = false;
-    
-    memset(p_req_buffer,0,TCP_LIMIT);
-    memset(response_buffer,0,TCP_LIMIT);
-    
-    int comm_socket = accept(welcome_socket,comm_addr, &comm_addr_size);
-    g_socket = &comm_socket;
-    if (comm_socket > 0)
+    while(true)
     {
-        while(true) 
+        ready_socket = poll(polled_fds, nfds, -1);
+        if (ready_socket < 0)
         {
-            char res[TCP_LIMIT];
-            int flags = 0;
-            int bytes_rx = recv(comm_socket, p_req_buffer, TCP_LIMIT, flags); 
-            if (bytes_rx <= 0) {
-                perror("ERROR: recv");
-                exit(EXIT_FAILURE);
-            }
+            perror("ERROR: poll() failed");
+            break;
+        }
+        if (ready_socket == 0) break;
 
-            if(!strcmp(p_req_buffer,"BYE\n")) break;
+        updated_num_fds = nfds;
+        for(int idx = 0; idx < updated_num_fds; idx++)
+        {
+            if(polled_fds[idx].revents == 0) continue;
 
-            printf("req_buff: %s\n",p_req_buffer);
-            bool req_is_ok = false;
-            if(!hello_sent)
+            if (polled_fds[idx].fd == server_socket)
             {
-                hello_sent = true;
-                req_is_ok = tcp_verify_begin(p_req_buffer);
-                tcp_setup_msg(response_buffer,"",req_is_ok,"HELLO");
+                    new_socket = accept(server_socket, NULL, NULL);
+                    if (new_socket < 0)
+                    {
+                        perror("ERROR: accept");
+                        fds_closed[idx] = true;
+                    }
+                    polled_fds[nfds].fd = new_socket;
+                    polled_fds[nfds].events = POLLIN;
+                    nfds += 1;
             }
             else
             {
-                printf("COMPUTING...\n");
-                req_is_ok = tcp_verify_req(p_req_buffer);
-                p_req_buffer += (int)strlen("SOLVE ");
-                frac_t result = get_result(&(p_req_buffer));
-                frac_to_string(result,res);
-                tcp_setup_msg(response_buffer,res, result.denominator == 0 && req_is_ok,"RESULT ");
-            }
+                fds_closed[idx] = false;
 
-            memset(p_req_buffer,0,TCP_LIMIT);
-            printf("res_buff: %s\n",response_buffer);
-            int bytes_tx = send(comm_socket, response_buffer, TCP_LIMIT, flags); 
-            if (bytes_tx <= 0) {
-                perror("ERROR: send");
-                exit(EXIT_FAILURE);
+                char res[TCP_LIMIT];
+                int flags = 0;
+
+                memset(p_req_buffer,0,TCP_LIMIT);
+                memset(response_buffer,0,TCP_LIMIT);
+
+                ready_socket = recv(polled_fds[idx].fd, p_req_buffer, TCP_LIMIT, flags);
+                if(ready_socket < 0)
+                {
+                    perror("ERROR: recv");
+                    fds_closed[idx] = true;
+                }
+                if(!strcmp(p_req_buffer,"BYE\n") || ready_socket == 0) fds_closed[idx] = true;
+
+                bool req_is_ok = false;
+                if(!said_hi[idx])
+                {
+                    said_hi[idx] = true;
+                    req_is_ok = tcp_verify_begin(p_req_buffer);
+                    tcp_setup_msg(response_buffer,"",req_is_ok,"HELLO");
+                }
+                else
+                {
+                    req_is_ok = tcp_verify_req(p_req_buffer);
+                    p_req_buffer += (int)strlen("SOLVE ");
+                    frac_t result = get_result(&(p_req_buffer));
+                    frac_to_string(result,res);
+                    tcp_setup_msg(response_buffer,res, result.denominator == 0 && req_is_ok,"RESULT ");
+                }
+                memset(p_req_buffer,0,TCP_LIMIT);
+                ready_socket = send(polled_fds[idx].fd, response_buffer, TCP_LIMIT, flags); 
+                if (ready_socket <= 0) {
+                    perror("ERROR: send");
+                    fds_closed[idx] = true;
+                }
+                memset(response_buffer,0,TCP_LIMIT);
+
+                if(fds_closed[idx])
+                {
+                    close(fds_closed[idx]);
+                    // remove descriptor
+                    polled_fds[idx].fd = -1;
+                    fds_closed[idx] = false;
+                    said_hi[idx] = false;
+                    update_fds = true;
+                }
+                if(update_fds)
+                {
+                    update_fds = false;
+                    for (int idx = 0; idx < nfds; idx++)
+                    {
+                        if(polled_fds[idx].fd == -1)
+                        {
+                            //move it to the left
+                            for(int move = idx; move < nfds; move++)
+                            {
+                                polled_fds[move].fd = polled_fds[move + 1].fd;
+                            }
+                            //bcs we moved elements, so we did not check the one on idx
+                            idx -= 1;
+                            nfds -= 1;
+                        }
+                    }
+                    
+                }
+
             }
-            memset(response_buffer,0,TCP_LIMIT);
+            if(close_all) 
+            {
+                for(int idx = 0; idx < updated_num_fds; idx++)
+                {
+                    if(polled_fds[idx].fd >= 0) close(polled_fds[idx].fd);
+                }
+                break;
+            }
         }
     }
-    printf("SHUTDOWN\n");
-    shutdown(comm_socket, SHUT_RDWR);
-    close(comm_socket);
-
-
+    shutdown(server_socket,SHUT_RDWR);
+    close(server_socket);
     return SUCCESS;
 }

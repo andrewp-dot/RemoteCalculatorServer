@@ -2,27 +2,29 @@
 
 ### Obash
 
-1. <a id="#basic_theory">Základná teória</a>
-2. <a id="#program_structure">Štruktúra programu</a>
-3. <a id=#testing>Testovanie</a>
-4. <a id="#sources">Zdroje</a>
+1. [Základná teória](#basic_theory)
+2. [Štruktúra programu](#program_structure)
+3. [Testovanie](#testing)
+4. [Zdroje](#sources)
 
-## <span id="basic_theory">1. Základná teória</span>
+## <a id="basic_theory">1. Základná teória</a>
 
 ### TCP
 
 ### UDP
 
-## <span id="program_structure">2. Štruktúra programu</span>
+## <a id="program_structure">2. Štruktúra programu</a>
 
-## <span id="testing">3. Testovanie</span>
+## <a id="testing">3. Testovanie</a>
 
-## <span id="sources">4. Zdroje</span>
+## <a id="sources">4. Zdroje</a>
 
 <hr>
 
-<a id="1">[1]</a> C Program to Find GCD of two Numbers \[online\], https://www.programiz.com/c-programming/examples/hcf-gcd
+<a id="1">[1]</a> _C Program to Find GCD of two Numbers_ \[online\], https://www.programiz.com/c-programming/examples/hcf-gcd
 
-<a id="2">[2]</a> C Program to Find LCM of two Numbers \[online\], https://www.programiz.com/c-programming/examples/lcm
+<a id="2">[2]</a> _C Program to Find LCM of two Numbers_ \[online\], https://www.programiz.com/c-programming/examples/lcm
 
-<a id="3">[3]</a> C Program to Convert Integer to String and Vice-versa \[online\], https://www.sanfoundry.com/c-program-integer-to-string-vice-versa/
+<a id="3">[3]</a> _C Program to Convert Integer to String and Vice-versa_ \[online\], https://www.sanfoundry.com/c-program-integer-to-string-vice-versa/
+
+<a id="4">[4]</a> Dolejška, Koutenský, _Programování síťových aplikací IPK 2022/2023 L_ , \[online\]

@@ -11,8 +11,11 @@
 #include <signal.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <poll.h>
+#include <fcntl.h>
 #include "../headers/ipkcpd.h"
 
+#define SERVER_CLIENT_LIMIT 100
 extern int * g_socket;
 
 void tcp_interrupt_handler(int noop);
