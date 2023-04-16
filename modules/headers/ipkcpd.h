@@ -33,5 +33,6 @@ bool verify_ipv4(char * ip);
 bool verify_port(char * port);
 connection_mode_t get_mode(char * mode);
 void close_connection(int num);
+void interrupt_handler(int noop);
 
 #endif

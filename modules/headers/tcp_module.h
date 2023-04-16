@@ -13,7 +13,9 @@
 #include <stdbool.h>
 #include "../headers/ipkcpd.h"
 
+extern int * g_socket;
 
+void tcp_interrupt_handler(int noop);
 bool tcp_verify_begin(char * begin_msg);
 bool tcp_verify_req(char * msg);
 void tcp_setup_msg(char * msg,char * res,int status,const char * MSG);

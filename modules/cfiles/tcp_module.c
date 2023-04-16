@@ -1,6 +1,13 @@
 #include "../headers/tcp_module.h"
 #include "../headers/calculator.h"
 
+void tcp_interrupt_handler(int noop)
+{
+    shutdown(g_socket, SHUT_RDWR);
+    close(g_socket);
+    exit(SUCCESS);
+}
+
 bool tcp_verify_begin(char * begin_msg)
 {
     if(begin_msg == NULL) return CONNECTION_MSG_ERR;
@@ -24,6 +31,7 @@ void tcp_setup_msg(char * msg,char * res,int status,const char * MSG)
         if(msg == NULL) return;
         strcat(msg_format,res);
         strcpy(msg,msg_format);
+        strcat(msg,"\n");
     }
     else strcpy(msg,"BYE\n");
 }
@@ -70,12 +78,15 @@ int tcp_communication(int port)
 
 
     bool hello_sent = false;
-    while(true) 
+    
+    memset(p_req_buffer,0,TCP_LIMIT);
+    memset(response_buffer,0,TCP_LIMIT);
+    
+    int comm_socket = accept(welcome_socket,comm_addr, &comm_addr_size);
+    g_socket = &comm_socket;
+    if (comm_socket > 0)
     {
-        memset(p_req_buffer,0,TCP_LIMIT);
-        memset(response_buffer,0,TCP_LIMIT);
-        int comm_socket = accept(welcome_socket,comm_addr, &comm_addr_size);
-        if (comm_socket > 0)
+        while(true) 
         {
             char res[TCP_LIMIT];
             int flags = 0;
@@ -85,19 +96,22 @@ int tcp_communication(int port)
                 exit(EXIT_FAILURE);
             }
 
+            if(!strcmp(p_req_buffer,"BYE\n")) break;
+
             printf("req_buff: %s\n",p_req_buffer);
             bool req_is_ok = false;
             if(!hello_sent)
             {
                 hello_sent = true;
                 req_is_ok = tcp_verify_begin(p_req_buffer);
-                tcp_setup_msg(response_buffer,"",req_is_ok,"HELLO\n");
+                tcp_setup_msg(response_buffer,"",req_is_ok,"HELLO");
             }
             else
             {
                 printf("COMPUTING...\n");
                 req_is_ok = tcp_verify_req(p_req_buffer);
-                frac_t result = get_result(&p_req_buffer);
+                p_req_buffer += (int)strlen("SOLVE ");
+                frac_t result = get_result(&(p_req_buffer));
                 frac_to_string(result,res);
                 tcp_setup_msg(response_buffer,res, result.denominator == 0 && req_is_ok,"RESULT ");
             }
@@ -111,10 +125,11 @@ int tcp_communication(int port)
             }
             memset(response_buffer,0,TCP_LIMIT);
         }
-        printf("SHUTDOWN\n");
-        shutdown(comm_socket, SHUT_RDWR);
-        close(comm_socket);
     }
+    printf("SHUTDOWN\n");
+    shutdown(comm_socket, SHUT_RDWR);
+    close(comm_socket);
+
 
     return SUCCESS;
 }

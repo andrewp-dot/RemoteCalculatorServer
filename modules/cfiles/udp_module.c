@@ -8,9 +8,12 @@ bool udp_verify_req(char * msg)
     return true;
 }
 
-void udp_interrupt_handler(int * socket)
+void udp_interrupt_handler(int noop)
 {
-    close(*socket);
+    if(write(1, "Socket closed\n",15) < 0) exit(EXIT_FAILURE);
+    close(*g_socket);
+    g_socket = NULL;
+    exit(SUCCESS);
 }
 
 void udp_setup_msg(char * buffer, char * res,int status)
@@ -24,12 +27,15 @@ void udp_setup_msg(char * buffer, char * res,int status)
 
 int udp_communication(int port)
 {
-    // char * arr = NULL;
+    signal(SIGTERM,udp_interrupt_handler);
+    signal(SIGKILL,udp_interrupt_handler);
     int server_socket = socket(AF_INET, SOCK_DGRAM, 0); if (server_socket <= 0)
     {
         perror("ERROR: socket");
         exit(EXIT_FAILURE); 
     }
+
+    g_socket = &server_socket;
 
     unsigned short server_port = port; 
     struct sockaddr_in server_addr; 

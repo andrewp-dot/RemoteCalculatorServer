@@ -37,14 +37,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "./modules/headers/tcp_module.h"
 #include "./modules/headers/ipkcpd.h"
 
-// void interrupt_handler(int noop);
-int port = PORT_UNDEFINED;
+int * g_socket = NULL;
 connection_mode_t mode = undef;
 
 int main(int argc, char ** argv)
 {   
-    signal(SIGINT,close_connection);
-    signal(SIGTERM,close_connection);
+    int port = PORT_UNDEFINED;
+    
+    signal(SIGINT,interrupt_handler);
+    signal(SIGTERM,interrupt_handler);
     char ip_address[IPV4_LENGTH] = {0};
 
     /* load args */
@@ -166,7 +167,8 @@ connection_mode_t get_mode(char * mode)
     else return undef;
 }
 
-void close_connection(int num) 
+void interrupt_handler(int num) 
 {
-    exit(SUCCESS);
+    if(mode == udp) udp_interrupt_handler(num);
+    else exit(EXIT_SUCCESS);
 }

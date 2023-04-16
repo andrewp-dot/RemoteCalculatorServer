@@ -16,7 +16,9 @@
 #define UDP_REQUEST_OFFSET 2
 #define UDP_BUFFER_RESULT_LIMIT UDP_LIMIT - UDP_RESPONSE_OFFSET
 
-void udp_interrupt_handler(int * socket);
+extern int * g_socket;
+
+void udp_interrupt_handler(int noop);
 bool udp_verify_req(char * msg);
 void udp_setup_msg(char * buffer, char * res, int status);
 int udp_communication(int port);
