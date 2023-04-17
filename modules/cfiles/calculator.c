@@ -23,9 +23,13 @@ bool is_number(char * num)
     if(num == NULL) return false;
 
     if(*num == '-') num += 1;
-    while (*num != ' ' && *num != ')')
+    while (*num != ' ' && *num != ')' && *num != '\0')
     {
-        if(!isdigit(*num)) return false;
+        if(!isdigit(*num))
+        {
+            printf("c: %c n: %d\n",*num,*num);
+            return false;
+        }
         num += 1;
     }
     return true;

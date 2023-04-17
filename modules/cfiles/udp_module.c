@@ -1,16 +1,31 @@
 #include "../headers/udp_module.h"
 #include "../headers/calculator.h"
+#include <ctype.h>
 
 bool udp_verify_req(char * msg)
 {
     if(msg == NULL) return false;
-    if(msg[0] != 0 || msg[2] != '(') return false;
+
+    char * temp = msg + UDP_REQUEST_OFFSET;
+    bool is_num = true;
+    while (*temp != ' ' && *temp != ')' && *temp != '\n' )
+    {
+        if(*temp == '\0') break;
+        if(!isdigit(*temp))
+        {
+            printf("c: %c n: %d\n",*temp,*temp);
+            is_num = false;
+        }
+        temp += 1;
+    }
+    if(is_num) return true;
+    
+    if(msg[0] != 0 || msg[2] != '(' ) return false;
     return true;
 }
 
 void udp_interrupt_handler(int noop)
 {
-    if(write(1, "Socket closed\n",15) < 0) exit(EXIT_FAILURE);
     close(*g_socket);
     g_socket = NULL;
     exit(SUCCESS);
@@ -76,6 +91,7 @@ int udp_communication(int port)
         {
             p_buffer += UDP_REQUEST_OFFSET;
             result = get_result(&p_buffer);
+            printf("DONE %d\n",result.numerator);
             frac_to_string_floored(result,res);
         }
         else  p_buffer += UDP_REQUEST_OFFSET;
