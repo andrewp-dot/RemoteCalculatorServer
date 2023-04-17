@@ -6,10 +6,9 @@
 #include <stdbool.h>
 #include "fraction.h"
 
-#define ERR_MSG_LENGTH 128
-#define MAX_FLOAT_LENGTH 100
-
 #define ERR -10
+#define MIN_OPERANDS 2
+
 typedef enum token_type{
     LB,
     RB,
@@ -34,10 +33,10 @@ typedef enum operation{
     NOT_SUPPORTED
 }operation_t;
 
+void print_token_type(token_t token);
 bool is_number(char * num);
 bool is_operation(char op);
 operation_t get_operation(char sym);
 token_t get_token(char ** expr);
-frac_t compute(frac_t op1,frac_t op2,char operator);
 frac_t get_result(char ** expr);
 #endif

@@ -65,19 +65,22 @@ frac_t inverted_fraction(frac_t f)
 void num_to_string(int num,char * str)
 {
     int length = 0;
-    int rem, n;
+    int rem, n,begin =0;
 
     if(num == 0)
     {
         strcpy(str,"0");
         return;
     }
+    
     n = num;
     while (n != 0)
     {
         length++;
         n /= 10;
     }
+
+    
     for (int idx = 0; idx < length; idx++)
     {
         rem = num % 10;
@@ -85,14 +88,15 @@ void num_to_string(int num,char * str)
         str[length - (idx + 1)] = rem + '0';
     }
 
+
     str[length] = '\0';
     
 }
 
 void frac_to_string(frac_t f, char * str)
 {
-    char numerator[100];
-    char denominator[100];
+    char numerator[MAX_NUM_LENGTH];
+    char denominator[MAX_NUM_LENGTH];
     if(f.denominator == 0) strcpy(str,"0/0");
     else if(f.denominator == 1) 
     {
@@ -103,7 +107,7 @@ void frac_to_string(frac_t f, char * str)
     {
         num_to_string(f.numerator,numerator);
         num_to_string(f.denominator,denominator);
-        char whole_frac[100];
+        char whole_frac[MAX_NUM_LENGTH];
         strcat(whole_frac,numerator);
         strcat(whole_frac,"/");
         strcat(whole_frac,denominator);

@@ -1,14 +1,7 @@
 #include "../headers/calculator.h"
+#include "../headers/calc_stack.h"
 #include <string.h>
 #include <ctype.h>
-
-/**
- * TODO:
- * Edit: compute function
- * Edit: get_result function
- * add support for multiple operands
- * improve syntax checking
- */
 
 /* temporary functions */
 void print_token_type(token_t token)
@@ -74,7 +67,7 @@ token_t get_token(char ** expr)
     token_t current_token;
     if(isdigit(**expr))
     {
-        char buffer[MAX_FLOAT_LENGTH] = {0};
+        char buffer[MAX_STACK_SIZE] = {0};
         int idx = 0;
         while (isdigit(**expr)) 
         {
@@ -102,48 +95,66 @@ token_t get_token(char ** expr)
     return current_token;
 }
 
-frac_t compute(frac_t op1,frac_t op2,char operator)
+frac_t compute(calc_stack_t * stack,operation_t operator)
 {
-    switch (get_operation(operator))
+    // calcs_print(stack);
+    if(size(stack) < MIN_OPERANDS) return ERR_FRAC;
+    frac_t result = ERR_FRAC;
+
+    switch (operator)
     {
     case ADD:
-        return frac_add(op1,op2);
+        result = calcs_pop(stack);
+        while (!is_empty(stack))
+        {
+            result = frac_add(result,calcs_pop(stack));
+            if(result.denominator == 0) return ERR_FRAC;
+        }
+        return result;
     case SUB:
-        return frac_sub(op1,op2);
+        calcs_reverse(stack);
+        result = calcs_pop(stack);
+        while (!is_empty(stack))
+        {
+            result = frac_sub(result,calcs_pop(stack));
+            if(result.denominator == 0) return ERR_FRAC;
+        }
+        return result;
     case MUL:
-        return frac_mul(op1,op2);
+        result = calcs_pop(stack);
+        while (!is_empty(stack))
+        {
+            result = frac_mul(result,calcs_pop(stack));
+            if(result.denominator == 0) return ERR_FRAC;
+        }
+        return result;
     case DIV:
-        return frac_div(op1,op2);
-    default: 
-        return ERR_FRAC;
+        calcs_reverse(stack);
+        result = calcs_pop(stack);
+        while (!is_empty(stack))
+        {
+            result = frac_div(result,calcs_pop(stack));
+            if(result.denominator == 0) return ERR_FRAC;
+        }
+        return result;
+    default:
+        break;
     }
+    return result;
 }
 
-/**
- * @brief Get the result of expresion expr
- * note:    it supports only (op E E), where 
- *          op -> operation
- *          E -> expresion
- * note2:   need to check if the first char in expr is '(', then call get_result
- * @param expr 
- * @param err_msg_buffer 
- * @return float 
- */
+
 frac_t get_result(char ** expr)
 {
-    // printf("EXPR: %s\n",*expr);
+    // printf("\t\tEXPR: %s\n",*expr);
+    // printf("\n___________________________\n");
     if(is_number(*expr)) return num_to_frac(atoi(*expr));
 
-    bool LB_found = false;
-    bool RB_found = false;
+    bool RB_found =false;
+    calc_stack_t stack;
+    init_calc_stack(&stack);
+    operation_t operator = NOT_SUPPORTED;
 
-    int operand_num = 0;
-    //use dynamic arr for multiple operands support
-    frac_t operands[2];
-    operands[0] = ERR_FRAC;
-    operands[1] = ERR_FRAC;
-    char operator = 0;
-    
     token_t current_token = get_token(expr);
     
     while (current_token.type != NEWLINE)
@@ -151,65 +162,52 @@ frac_t get_result(char ** expr)
         switch (current_token.type)
         {
         case LB:
-            if(LB_found) 
-            {
-                return ERR_FRAC;
-            }
-            else LB_found = true;
-
+            printf("LB\n");
             current_token = get_token(expr);
             if(current_token.type != OPERATOR) return ERR_FRAC;
             break;
         case OPERATOR:
-            operator = current_token.sym;
+            printf("OPERATOR\n");
+            operator = get_operation(current_token.sym);
             current_token = get_token(expr);
-            if(current_token.type != SPACE)  return ERR_FRAC;
+            if(current_token.type != SPACE) return ERR_FRAC;
             break;
         case SPACE:
+            printf("SPACE\n");
             current_token = get_token(expr);
             if(current_token.type != OPERAND && current_token.type != LB) return ERR_FRAC;
             if(current_token.type == LB)
             {
-                operands[operand_num] = get_result(expr);
-                if(operands[operand_num].denominator == 0) return ERR_FRAC;
-                current_token = get_token(expr);  
-                operand_num += 1;
+                frac_t res = get_result(expr);
+                if(!calcs_push(&stack,res)) return ERR_FRAC;      
+                current_token = get_token(expr);
             }
             break;
         case OPERAND:
-            if(operand_num >= 2) 
-            {
-                printf("Too many operands\n"); return ERR_FRAC;
-            }
-            operands[operand_num] = num_to_frac(current_token.value);
-            operand_num += 1;
+            printf("OPERAND\n");
+            if(!calcs_push(&stack,num_to_frac(current_token.value))) return ERR_FRAC;            
             current_token = get_token(expr);
-            if(operand_num == sizeof(operands)/sizeof(frac_t)) 
-            {
-                if(current_token.type != RB) return ERR_FRAC;
-            }
-            if(current_token.type != SPACE && current_token.type != RB ) return ERR_FRAC;
+            if(current_token.type != SPACE && current_token.type != RB) return ERR_FRAC;
             break;
-        case RB:
-            if(RB_found)
+        case RB: 
+            if(RB_found) 
             {
                 return ERR_FRAC;
             }
-            RB_found = true; 
-            // if(operand_num == sizeof(operands)/sizeof(frac_t)) 
-            // {
-            //     current_token = get_token(expr);
-            //     printf("before comp: %d\n",current_token.sym);
-            //     current_token = get_token(expr);
-            //     printf("before comp: %d\n",current_token.sym);
-            // }
-            frac_t result = compute(operands[0],operands[1],operator);
-            int floor_result = result.numerator / result.denominator;
-            if(floor_result >= 0) return result;
-            return ERR_FRAC;
+            else RB_found = true;
+            printf("RB\n");
+            // current_token = get_token(expr);
+            if(current_token.type != RB && current_token.type != SPACE && current_token.type != NEWLINE) return ERR_FRAC;
+            // print_token_type(current_token);
+            // if(current_token.type == SPACE || current_token.type == NEWLINE) break;
+            return compute(&stack,operator);
+            
+        case NEWLINE:
+            break;
         default:
             return ERR_FRAC;
         }
     }
-    return compute(operands[0],operands[1],operator);
+    return ERR_FRAC;
 }
+

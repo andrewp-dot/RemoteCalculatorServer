@@ -25,6 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /* Custom modules */
 #include "./modules/headers/calculator.h"
+#include "./modules/headers/calc_stack.h"
 #include "./modules/headers/fraction.h"
 #include "./modules/headers/udp_module.h"
 #include "./modules/headers/tcp_module.h"
@@ -32,6 +33,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 int * g_socket = NULL;
 connection_mode_t mode = undef;
+struct pollfd * polled_fds = NULL;
 
 int main(int argc, char ** argv)
 {   
@@ -102,13 +104,13 @@ int main(int argc, char ** argv)
             only_equation[strlen(only_equation)-1] = '\0';
             printf("%s = ",only_equation);
             frac_t result = get_result(&expr);
-            if(result.denominator == 0) strcpy(res,"ERR");
+            if(result.denominator == 0 || result.numerator < 0) strcpy(res,"ERR");
             else frac_to_string_floored(result,res);
             printf("%s",res);
             printf("\n");
             idx = 0;
-            memset(char_arr,0,strlen(expr));
-            memset(res,0,strlen(expr));
+            memset(expr,0,100);
+            memset(res,0,100);
         }
     }
 
@@ -175,5 +177,6 @@ connection_mode_t get_mode(char * mode)
 void interrupt_handler(int num) 
 {
     if(mode == udp) udp_interrupt_handler(num);
-    else exit(EXIT_SUCCESS);
+    else if (mode == tcp) tcp_interrupt_handler(num);
+    else exit(SUCCESS);
 }

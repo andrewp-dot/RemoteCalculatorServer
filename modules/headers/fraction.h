@@ -10,7 +10,8 @@ typedef struct fraction{
     int denominator;
 }frac_t;
 
-#define ERR_FRAC (frac_t){.numerator = 0,.denominator = 0};
+#define ERR_FRAC (frac_t){.numerator = 0,.denominator = 0}
+#define MAX_NUM_LENGTH 100
 
 /* auxiliary functions */
 void print_frac(frac_t f);

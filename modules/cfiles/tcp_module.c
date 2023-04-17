@@ -3,6 +3,23 @@
 
 void tcp_interrupt_handler(int noop)
 {
+    const char * bye = "BYE\n";
+    int flags = 0;
+    if(polled_fds != NULL)
+    {
+        for(int idx = 0; idx < SERVER_CLIENT_LIMIT; idx++)
+        {
+            if(polled_fds[idx].fd > 0)
+            {
+                int bytes_sx = send(polled_fds[idx].fd, bye, strlen(bye), flags); 
+                if (bytes_sx <= 0) {
+                    perror("ERROR: send");
+                }
+                close(polled_fds[idx].fd);
+                polled_fds[idx].fd = -1;
+            }
+        }
+    }
     shutdown(*g_socket, SHUT_RDWR);
     close(*g_socket);
     exit(SUCCESS);
@@ -87,7 +104,7 @@ int tcp_communication(int port)
     }
 
     int nfds = SERVER_CLIENT_LIMIT;
-    struct pollfd *polled_fds;
+
     polled_fds = calloc(nfds, sizeof(struct pollfd)); 
 
     int max_waiting_connections = SERVER_CLIENT_LIMIT;

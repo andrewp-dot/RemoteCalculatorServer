@@ -17,7 +17,7 @@
 
 #define SERVER_CLIENT_LIMIT 100
 extern int * g_socket;
-
+extern struct pollfd * polled_fds;
 
 void tcp_interrupt_handler(int noop);
 bool tcp_verify_begin(char * begin_msg);

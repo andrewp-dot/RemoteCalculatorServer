@@ -17,7 +17,7 @@ DEBUG_MACRO=NONE
 CC=gcc
 CFLAGS=-Wall -Werror -pedantic
 
-OBJS=$(OBJDIR)/fraction.o $(OBJDIR)/calculator.o $(OBJDIR)/tcp_module.o $(OBJDIR)/udp_module.o $(OBJDIR)/$(MAIN).o
+OBJS=$(OBJDIR)/fraction.o $(OBJDIR)/calculator.o $(OBJDIR)/tcp_module.o $(OBJDIR)/udp_module.o $(OBJDIR)/$(MAIN).o $(OBJDIR)/calc_stack.o
 
 all: directories $(MAIN)
 
@@ -48,5 +48,7 @@ arg_test:
 	make DEBUG_MACRO="TEST_ARGS" 
 	python3 test_inputs.py
 
-	
+calc_test:
+	make clean
+	make run DEBUG_MACRO="TEST_CALC" ARGS="-h 127.0.0.1 -p 2023 -m udp"
 
