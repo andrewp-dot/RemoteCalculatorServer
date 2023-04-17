@@ -1,0 +1,33 @@
+- last changes
+- bugfix udp
+- add zip
+- minor changes
+- refactor of calculator and documentation finished
+- fix mistake
+- add documentation, testing
+- bugfix
+- add multiple connections
+- add documentation template
+- add C-C handling
+- tcp with bug
+- restruct project and tcp template
+- add udp request verification
+- add udp protocol beta
+- add udp prototype
+- delete support for explicit negative numbers
+- bugfix
+- remove unnecessary comments
+- add calculator fraction support
+- add fraction module
+- add recursive computing
+- add basic format and operations
+- add calculator module
+- fix imports
+- refactor code and add calculator
+- restructure project
+- add license
+- add all arguments
+- fix ip verification
+- remove .vscode config
+- improved Makefile
+- initial commit

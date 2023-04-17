@@ -92,6 +92,7 @@ token_t get_token(char ** expr)
         current_token.type = UNKNOWN;
     }
     current_token.sym = **expr;
+    (*expr) += 1;
     return current_token;
 }
 

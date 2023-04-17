@@ -25,7 +25,7 @@ directories:
 	mkdir -p $(OBJDIR)
 
 $(MAIN): $(OBJS)
-	$(CC) $(CFLAGS)  $(OBJS) -o $@
+	$(CC) $(CFLAGS) $(OBJS) -o $@
 
 $(OBJDIR)/%.o: $(CFILES_PATH)/%.c  $(HEADERS_PATH)/%.h
 	${CC} -c $< -o $@
@@ -41,7 +41,7 @@ clean:
 	rm -rf *.log $(MAIN) $(OBJDIR)
 
 zip:
-	zip -r $(LOGIN).zip Makefile LICENSE README.md ipkcpd.c modules/* tests/*
+	zip -r $(LOGIN).zip CHANGELOG.md Makefile LICENSE README.md ipkcpd.c modules/* tests/*
 
 arg_test:
 	make clean

@@ -129,6 +129,7 @@ int tcp_communication(int port)
 
     while(true)
     {
+
         ready_socket = poll(polled_fds, nfds, -1);
         if (ready_socket < 0)
         {
@@ -165,7 +166,7 @@ int tcp_communication(int port)
                 memset(response_buffer,0,TCP_LIMIT);
 
                 ready_socket = recv(polled_fds[idx].fd, p_req_buffer, TCP_LIMIT, flags);
-                if(ready_socket < 0)
+                if(ready_socket <= 0)
                 {
                     perror("ERROR: recv");
                     fds_closed[idx] = true;
@@ -184,8 +185,9 @@ int tcp_communication(int port)
                     req_is_ok = tcp_verify_req(p_req_buffer);
                     p_req_buffer += (int)strlen("SOLVE ");
                     frac_t result = get_result(&(p_req_buffer));
+                    print_frac(result);
                     frac_to_string_floored(result,res);
-                    tcp_setup_msg(response_buffer,res, result.denominator == 0 || req_is_ok,"RESULT ");
+                    tcp_setup_msg(response_buffer,res, result.denominator == 0 && req_is_ok,"RESULT ");
                 }
                 memset(p_req_buffer,0,TCP_LIMIT);
 

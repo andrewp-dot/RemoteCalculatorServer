@@ -16,3 +16,6 @@
 !tests
 !tests/*
 !xponec01.zip
+!test_inputs.py
+!xponec01.png
+!CHANGELOG.md
