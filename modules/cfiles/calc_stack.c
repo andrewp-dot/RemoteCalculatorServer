@@ -65,8 +65,9 @@ frac_t top(calc_stack_t *stack)
 void calcs_reverse(calc_stack_t *stack)
 {
     int N = stack->top + 1;
+    int limit = N/2;
     frac_t tmp;
-    for(int idx = 0; idx < N/2; idx++)
+    for(int idx = 0; idx < limit; idx++)
     {
         tmp.numerator = stack->data[idx].numerator;
         tmp.denominator = stack->data[idx].denominator;

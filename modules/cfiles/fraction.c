@@ -108,6 +108,7 @@ void frac_to_string(frac_t f, char * str)
         strcat(whole_frac,numerator);
         strcat(whole_frac,"/");
         strcat(whole_frac,denominator);
+        strcat(str,whole_frac);
     }
 }
 

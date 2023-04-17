@@ -27,7 +27,6 @@ bool is_number(char * num)
     {
         if(!isdigit(*num))
         {
-            printf("c: %c n: %d\n",*num,*num);
             return false;
         }
         num += 1;
@@ -76,7 +75,7 @@ token_t get_token(char ** expr)
         while (isdigit(**expr)) 
         {
             buffer[idx] = **expr;
-            (*expr)++;
+            (*expr) += 1;
             idx += 1;
         }
         current_token.type = OPERAND;
@@ -91,11 +90,8 @@ token_t get_token(char ** expr)
     else
     {
         current_token.type = UNKNOWN;
-        (*expr)++;
-        return current_token;
     }
     current_token.sym = **expr;
-    (*expr)++;
     return current_token;
 }
 
@@ -157,6 +153,7 @@ frac_t get_result(char ** expr)
     init_calc_stack(&stack);
     operation_t operator = NOT_SUPPORTED;
 
+    //abort
     token_t current_token = get_token(expr);
     
     while (current_token.type != NEWLINE)
@@ -192,16 +189,15 @@ frac_t get_result(char ** expr)
             if(current_token.type != SPACE && current_token.type != RB) return ERR_FRAC;
             break;
         case RB: 
+            // printf("RB\n");
             if(RB_found) 
             {
                 return ERR_FRAC;
             }
-            else RB_found = true;;
+            else RB_found = true;
             if(current_token.type != RB && current_token.type != SPACE && current_token.type != NEWLINE) return ERR_FRAC;
             return compute(&stack,operator);
-            
-        case NEWLINE:
-            break;
+
         default:
             return ERR_FRAC;
         }

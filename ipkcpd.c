@@ -85,7 +85,7 @@ int main(int argc, char ** argv)
     char char_arr[UDP_LIMIT] = {0,};
     char * expr = char_arr;
 
-    char c;
+    int c;
     int idx = 0;
 
     FILE * fp = fopen("./tests/calc_test.txt","r");
@@ -115,6 +115,7 @@ int main(int argc, char ** argv)
         }
     }
 
+    
     fclose(fp);
     return SUCCESS;
     #endif
