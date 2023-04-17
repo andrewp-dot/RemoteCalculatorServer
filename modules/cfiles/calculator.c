@@ -146,11 +146,9 @@ frac_t compute(calc_stack_t * stack,operation_t operator)
 
 frac_t get_result(char ** expr)
 {
-    // printf("\t\tEXPR: %s\n",*expr);
-    // printf("\n___________________________\n");
     if(is_number(*expr)) return num_to_frac(atoi(*expr));
 
-    bool RB_found =false;
+    bool RB_found = false;
     calc_stack_t stack;
     init_calc_stack(&stack);
     operation_t operator = NOT_SUPPORTED;
@@ -162,18 +160,18 @@ frac_t get_result(char ** expr)
         switch (current_token.type)
         {
         case LB:
-            printf("LB\n");
+            // printf("LB\n");
             current_token = get_token(expr);
             if(current_token.type != OPERATOR) return ERR_FRAC;
             break;
         case OPERATOR:
-            printf("OPERATOR\n");
+            // printf("OPERATOR\n");
             operator = get_operation(current_token.sym);
             current_token = get_token(expr);
             if(current_token.type != SPACE) return ERR_FRAC;
             break;
         case SPACE:
-            printf("SPACE\n");
+            // printf("SPACE\n");
             current_token = get_token(expr);
             if(current_token.type != OPERAND && current_token.type != LB) return ERR_FRAC;
             if(current_token.type == LB)
@@ -184,7 +182,7 @@ frac_t get_result(char ** expr)
             }
             break;
         case OPERAND:
-            printf("OPERAND\n");
+            // printf("OPERAND\n");
             if(!calcs_push(&stack,num_to_frac(current_token.value))) return ERR_FRAC;            
             current_token = get_token(expr);
             if(current_token.type != SPACE && current_token.type != RB) return ERR_FRAC;
@@ -194,12 +192,8 @@ frac_t get_result(char ** expr)
             {
                 return ERR_FRAC;
             }
-            else RB_found = true;
-            printf("RB\n");
-            // current_token = get_token(expr);
+            else RB_found = true;;
             if(current_token.type != RB && current_token.type != SPACE && current_token.type != NEWLINE) return ERR_FRAC;
-            // print_token_type(current_token);
-            // if(current_token.type == SPACE || current_token.type == NEWLINE) break;
             return compute(&stack,operator);
             
         case NEWLINE:

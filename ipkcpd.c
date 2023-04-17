@@ -88,7 +88,6 @@ int main(int argc, char ** argv)
     char c;
     int idx = 0;
 
-    // #ifdef TEST_CALC
     FILE * fp = fopen("./tests/calc_test.txt","r");
     
     while ((c = fgetc(fp)) != EOF)
@@ -98,19 +97,21 @@ int main(int argc, char ** argv)
         idx++;
         if(c == '\n')
         {
-            char only_equation[100];
-            char res[100];
+            char only_equation[UDP_LIMIT];
+            char res[UDP_LIMIT];
             strcpy(only_equation,expr);
             only_equation[strlen(only_equation)-1] = '\0';
             printf("%s = ",only_equation);
+
             frac_t result = get_result(&expr);
             if(result.denominator == 0 || result.numerator < 0) strcpy(res,"ERR");
             else frac_to_string_floored(result,res);
             printf("%s",res);
             printf("\n");
+
             idx = 0;
-            memset(expr,0,100);
-            memset(res,0,100);
+            memset(expr,0,UDP_LIMIT);
+            memset(res,0,UDP_LIMIT);
         }
     }
 
